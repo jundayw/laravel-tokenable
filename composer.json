@@ -1,0 +1,60 @@
+{
+    "name": "jundayw/tokenable",
+    "description": "Laravel Tokenable provides multi-model and multi-platform authentication with refresh tokens for APIs, SPAs, and SSR.",
+    "keywords": [
+        "laravel",
+        "token",
+        "authentication",
+        "api-auth",
+        "spa",
+        "ssr",
+        "multi-model",
+        "multi-platform",
+        "refresh-token",
+        "jwt",
+        "oauth",
+        "cookie-auth"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/jundayw/laravel-tokenable",
+    "authors": [
+        {
+            "name": "jundayw",
+            "email": "jundayw@126.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "firebase/php-jwt": "^6.11"
+    },
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "Jundayw\\Tokenable\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Jundayw\\Tokenable\\TokenableServiceProvider"
+            ],
+            "aliases": {
+                "Token": "Jundayw\\Tokenable\\Facades\\Token"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
