@@ -1,0 +1,32 @@
+{
+    "name": "laravel-tokenable",
+    "version": "1.0.0",
+    "private": true,
+    "author": "Xander Moore <jundayw@126.com> (https://github.com/jundayw/)",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "token",
+        "authentication",
+        "api-auth",
+        "spa",
+        "ssr",
+        "multi-model",
+        "multi-platform",
+        "refresh-token",
+        "jwt",
+        "oauth",
+        "cookie-auth"
+    ],
+    "scripts": {
+        "docs:dev": "vuepress dev docs",
+        "docs:build": "vuepress build docs",
+        "deploy": "gh-pages -d docs/.vuepress/dist -b dist -r git@github.com:jundayw/laravel-tokenable.git"
+    },
+    "dependencies": {
+        "vuepress": "^1.9.10"
+    },
+    "devDependencies": {
+        "gh-pages": "^6.3.0"
+    }
+}
