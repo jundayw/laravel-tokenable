@@ -1,7 +1,7 @@
 <a id="readme-top"></a>
 
 <p align="center">
-    <img src="docs/.vuepress/public/LaravelTokenableIcon.svg" alt="Logo Laravel Tokenable">
+    <img src="docs/.vuepress/public/LaravelTokenableIcon.svg" alt="Logo Laravel Tokenable" height="35px">
 </p>
 
 <!-- CONTRIBUTING -->
