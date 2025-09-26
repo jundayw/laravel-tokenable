@@ -2,7 +2,7 @@
 
 namespace Jundayw\Tokenable\Tokens;
 
-class JsonWebToken extends Tokenization
+class JsonWebToken extends Token
 {
 
 }

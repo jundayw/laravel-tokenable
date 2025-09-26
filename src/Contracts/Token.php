@@ -2,7 +2,7 @@
 
 namespace Jundayw\Tokenable\Contracts;
 
-interface Tokenizable
+interface Token
 {
 
 }

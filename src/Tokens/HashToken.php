@@ -2,7 +2,7 @@
 
 namespace Jundayw\Tokenable\Tokens;
 
-class HashToken extends Tokenization
+class HashToken extends Token
 {
 
 }
