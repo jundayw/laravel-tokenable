@@ -119,7 +119,7 @@ abstract class Token implements TokenContract
      */
     public function getExpiresIn(): string
     {
-        return $this->expiresIn ?? '';
+        return $this->expiresIn ?? now()->toIso8601ZuluString();
     }
 
     /**
