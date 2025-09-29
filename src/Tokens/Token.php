@@ -16,9 +16,13 @@ abstract class Token implements TokenContract
 {
     public string        $name;
     protected Repository $config;
-    protected ?string    $accessToken  = null;
-    protected ?string    $refreshToken = null;
-    protected string     $expiresIn;
+
+    protected ?string $accessToken       = null;
+    protected ?string $refreshToken      = null;
+    protected ?string $authorizationCode = null;
+
+    protected string $expiresIn;
+    protected array  $attributes = [];
 
     /**
      * Get the name of the instance.
@@ -71,7 +75,7 @@ abstract class Token implements TokenContract
      *
      * @return string|null
      */
-    public function getAccessToken(): ?string
+    final public function getAccessToken(): ?string
     {
         return hash('sha256', $this->accessToken);
     }
@@ -94,7 +98,7 @@ abstract class Token implements TokenContract
      *
      * @return string|null
      */
-    public function getRefreshToken(): ?string
+    final public function getRefreshToken(): ?string
     {
         return hash('sha512', $this->refreshToken);
     }
@@ -109,6 +113,29 @@ abstract class Token implements TokenContract
     public function setRefreshToken(string $token): static
     {
         $this->refreshToken = $token;
+        return $this;
+    }
+
+    /**
+     * Get the current auth code value.
+     *
+     * @return string|null
+     */
+    final public function getAuthorizationCode(): ?string
+    {
+        return hash('sha384', $this->authorizationCode);
+    }
+
+    /**
+     * Set the raw auth code value before hashing.
+     *
+     * @param string $code
+     *
+     * @return static
+     */
+    public function setAuthorizationCode(string $code): static
+    {
+        $this->authorizationCode = $code;
         return $this;
     }
 
@@ -145,6 +172,18 @@ abstract class Token implements TokenContract
      * @return string
      */
     abstract protected function generateRefreshToken(Authenticable $authentication, TokenableContract $tokenable): string;
+
+    /**
+     * Generate a new auth code.
+     *
+     * The authentication code has a short expiration period; it is used to obtain a new token pair.
+     *
+     * @param Authenticable     $authentication
+     * @param TokenableContract $tokenable
+     *
+     * @return string
+     */
+    abstract protected function generateAuthorizationCode(Authenticable $authentication, TokenableContract $tokenable): string;
 
     /**
      * Generate a unique access token for the given authorizable and tokenizable.
@@ -189,6 +228,33 @@ abstract class Token implements TokenContract
         $this->accessToken  = $this->generateUniqueAccessToken($authentication, $tokenable);
         $this->refreshToken = $this->generateUniqueRefreshToken($authentication, $tokenable);
         $this->expiresIn    = $authentication->getAttribute('access_token_expire_at')->toIso8601ZuluString();
+        $this->attributes   = [
+            'access_token'  => $this->accessToken,
+            'token_type'    => $this->getResponseType(),
+            'expires_in'    => $this->getExpiresIn(),
+            'refresh_token' => $this->refreshToken,
+            'type'          => 'token',
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Build an auth code from given values.
+     *
+     * @param Authenticable     $authentication
+     * @param TokenableContract $tokenable
+     *
+     * @return static
+     */
+    public function buildAuthCode(Authenticable $authentication, TokenableContract $tokenable): static
+    {
+        $this->authorizationCode = $this->generateAuthorizationCode($authentication, $tokenable);
+        $this->attributes        = [
+            'auth_code' => $this->authorizationCode,
+            'code_type' => $this->getResponseType(),
+            'type'      => 'code',
+        ];
 
         return $this;
     }
@@ -259,7 +325,7 @@ abstract class Token implements TokenContract
      *
      * @return string
      */
-    protected function getTokenType(): string
+    protected function getResponseType(): string
     {
         return with(
             value: $this->getName() === config('tokenable.default.driver'),
@@ -276,15 +342,10 @@ abstract class Token implements TokenContract
     public function toArray(): array
     {
         if (is_callable($tokenable = Tokenable::tokenable())) {
-            return Closure::bind($tokenable, $this, static::class)($this);
+            return Closure::bind($tokenable, $this, static::class)($this->attributes, $this);
         }
 
-        return [
-            "access_token"  => $this->accessToken,
-            "token_type"    => $this->getTokenType(),
-            "expires_in"    => $this->getExpiresIn(),
-            "refresh_token" => $this->refreshToken,
-        ];
+        return $this->attributes;
     }
 
     /**

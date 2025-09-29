@@ -26,13 +26,7 @@ class HashToken extends Token
      */
     protected function generateAccessToken(Authenticable $authentication, Tokenable $tokenable): string
     {
-        return hash_hmac($this->getConfig()->get('algo'), json_encode([
-            'jti' => $this->ulid(),
-            'iss' => $authentication->getAttribute('tokenable_type'),
-            'sub' => $authentication->getAttribute('tokenable_id'),
-            'exp' => $authentication->getAttribute('access_token_expire_at'),
-            'iat' => now()->getTimestamp(),
-        ], JSON_UNESCAPED_UNICODE), $this->getConfig()->get('secret'));
+        return hash_hmac($this->getConfig()->get('algo'), $this->ulid(), $this->getConfig()->get('secret'));
     }
 
     /**
@@ -47,14 +41,22 @@ class HashToken extends Token
      */
     protected function generateRefreshToken(Authenticable $authentication, Tokenable $tokenable): string
     {
-        return hash_hmac($this->getConfig()->get('algo'), json_encode([
-            'jti' => $this->ulid(),
-            'iss' => $authentication->getAttribute('tokenable_type'),
-            'sub' => $authentication->getAttribute('tokenable_id'),
-            'exp' => $authentication->getAttribute('access_token_expire_at'),
-            'nbf' => $authentication->getAttribute('refresh_token_available_at'),
-            'iat' => now()->getTimestamp(),
-        ], JSON_UNESCAPED_UNICODE), $this->getConfig()->get('secret'));
+        return hash_hmac($this->getConfig()->get('algo'), $this->ulid(), $this->getConfig()->get('secret'));
+    }
+
+    /**
+     * Generate a new auth code.
+     *
+     * The authentication code has a short expiration period; it is used to obtain a new token pair.
+     *
+     * @param Authenticable $authentication
+     * @param Tokenable     $tokenable
+     *
+     * @return string
+     */
+    protected function generateAuthorizationCode(Authenticable $authentication, Tokenable $tokenable): string
+    {
+        return hash_hmac($this->getConfig()->get('algo'), $this->ulid(), $this->getConfig()->get('secret'));
     }
 
     /**

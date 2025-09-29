@@ -66,6 +66,29 @@ class JsonWebToken extends Token
         return JWT::encode($payload, $this->getKeyByAlgorithm(), $this->getConfig()->get('algo'));
     }
 
+    /**
+     * Generate a new auth code.
+     *
+     * The authentication code has a short expiration period; it is used to obtain a new token pair.
+     *
+     * @param Authenticable     $authentication
+     * @param TokenableContract $tokenable
+     *
+     * @return string
+     */
+    protected function generateAuthorizationCode(Authenticable $authentication, TokenableContract $tokenable): string
+    {
+        $claims  = $tokenable->getJWTCustomClaims();
+        $payload = $claims + [
+                'jti' => $tokenable->getJWTId(),
+                'iss' => $tokenable->getJWTIssuer(),
+                'sub' => $tokenable->getJWTIdentifier(),
+                'iat' => now()->getTimestamp(),
+            ];
+
+        return JWT::encode($payload, $this->getKeyByAlgorithm(), $this->getConfig()->get('algo'));
+    }
+
     protected function getKeyByAlgorithm(bool $isPrivate = true): string
     {
         if (str_starts_with($this->getConfig()->get('algo'), 'H')) {

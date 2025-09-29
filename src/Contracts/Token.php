@@ -84,6 +84,22 @@ interface Token extends Arrayable, Jsonable
     public function setRefreshToken(string $token): static;
 
     /**
+     * Get the current auth code value.
+     *
+     * @return string|null
+     */
+    public function getAuthorizationCode(): ?string;
+
+    /**
+     * Set the raw auth code value before hashing.
+     *
+     * @param string $code
+     *
+     * @return static
+     */
+    public function setAuthorizationCode(string $code): static;
+
+    /**
      * Get the number of seconds until the access token expires.
      *
      * @return string
@@ -99,6 +115,16 @@ interface Token extends Arrayable, Jsonable
      * @return static
      */
     public function buildTokens(Authenticable $authentication, Tokenable $tokenable): static;
+
+    /**
+     * Build an auth code from given values.
+     *
+     * @param Authenticable $authentication
+     * @param Tokenable     $tokenable
+     *
+     * @return static
+     */
+    public function buildAuthCode(Authenticable $authentication, Tokenable $tokenable): static;
 
     /**
      * Returns the identifier as a RFC 9562/4122 case-insensitive string.
