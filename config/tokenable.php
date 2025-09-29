@@ -113,6 +113,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Authorization Code Lifetime
+    |--------------------------------------------------------------------------
+    |
+    | This value defines the time-to-live of authorization codes. Since these
+    | codes are intended to be short-lived and exchanged quickly for access
+    | tokens, their lifetime should remain very short (typically 30–300
+    | seconds). Once an authorization code expires, the client must restart
+    | the authorization flow to obtain a new one.
+    |
+    */
+
+    'auth_code_ttl' => env('TOKEN_AUTH_CODE_TTL', 60),
+
+    /*
+    |--------------------------------------------------------------------------
     | Key Storage Path
     |--------------------------------------------------------------------------
     |
