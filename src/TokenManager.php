@@ -132,6 +132,24 @@ class TokenManager implements Contracts\TokenManager
     }
 
     /**
+     * Normalize the given driver name.
+     *
+     * Ensures the driver is supported (built-in or custom) and
+     * returns the normalized driver name. Returns null if the
+     * driver is not supported.
+     *
+     * @param string|null $driver
+     *
+     * @return string|null
+     */
+    public function normalizeDriverName(string $driver = null): ?string
+    {
+        $drivers = array_merge(['hash', 'jwt'], array_keys($this->customCreators));
+
+        return in_array($driver, $drivers) ? $driver : null;
+    }
+
+    /**
      * Dynamically call the default driver instance.
      *
      * @param string $method
