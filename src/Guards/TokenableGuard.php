@@ -2,27 +2,34 @@
 
 namespace Jundayw\Tokenable\Guards;
 
+use Illuminate\Auth\Events\Authenticated;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
-use Jundayw\Tokenable\Concerns\Auth\TokenableHelpers;
-use Jundayw\Tokenable\Contracts\Auth\SupportsTokenable;
+use Jundayw\Tokenable\Concerns\Auth\TokenableAuthHelpers;
+use Jundayw\Tokenable\Contracts\Auth\TokenableAuthGuard;
+use Jundayw\Tokenable\Contracts\Grant\Grant;
+use Jundayw\Tokenable\Contracts\Grant\TransientGrant;
+use Jundayw\Tokenable\Contracts\Tokenable;
 
-class TokenableGuard implements Guard, SupportsTokenable
+class TokenableGuard implements Guard, TokenableAuthGuard
 {
-    use GuardHelpers, TokenableHelpers, Macroable;
+    use GuardHelpers, TokenableAuthHelpers, Macroable;
 
     public function __construct(
         protected string $name,
         protected Repository $config,
-        protected Auth $auth,
+        protected Grant $grant,
+        protected TransientGrant $transientGrant,
         protected Request $request,
-        UserProvider $provider
+        ?UserProvider $provider
     ) {
         $this->provider = $provider;
     }
@@ -41,13 +48,11 @@ class TokenableGuard implements Guard, SupportsTokenable
             return $this->user;
         }
 
-        $user = null;
-
-        if (!empty($token)) {
-            $user = $this->provider->retrieveByCredentials([]);
+        if (!is_null($this->user = $this->grant->findAccessToken($this->request))) {
+            $this->fireAuthenticatedEvent($this->user);
         }
 
-        return $this->user = $user;
+        return $this->user;
     }
 
     /**
@@ -59,6 +64,93 @@ class TokenableGuard implements Guard, SupportsTokenable
      */
     public function validate(array $credentials = []): bool
     {
-        return !is_null($this->provider->retrieveByCredentials($credentials));
+        return !is_null($this->provider?->retrieveByCredentials($credentials));
+    }
+
+    /**
+     * Fire the authenticated event.
+     *
+     * @param Authenticatable $user
+     *
+     * @return void
+     */
+    protected function fireAuthenticatedEvent(Authenticatable $user): void
+    {
+        event(new Authenticated($this->name, $user));
+    }
+
+    /**
+     * Fire the login event.
+     *
+     * @param Authenticatable $user
+     *
+     * @return void
+     */
+    protected function fireLoginEvent(Authenticatable $user): void
+    {
+        event(new Login($this->name, $user, false));
+    }
+
+    /**
+     * Fire the logout event.
+     *
+     * @param Authenticatable $user
+     *
+     * @return void
+     */
+    protected function fireLogoutEvent(Authenticatable $user): void
+    {
+        event(new Logout($this->name, $user));
+    }
+
+    /**
+     * Get the name associated with the instance.
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get the specified configuration value.
+     *
+     * @param string     $key
+     * @param mixed|null $default
+     *
+     * @return mixed
+     */
+    public function getConfig(string $key, mixed $default = null): mixed
+    {
+        return $this->config->get($key, $default);
+    }
+
+    /**
+     * Return the currently cached user.
+     *
+     * @return Authenticatable|Tokenable|Model|null
+     */
+    public function getUser(): Authenticatable|Tokenable|Model|null
+    {
+        if ($this->hasUser()) {
+            return $this->user;
+        }
+
+        return null;
+    }
+
+    /**
+     * Set the current request instance.
+     *
+     * @param Request $request
+     *
+     * @return static
+     */
+    public function setRequest(Request $request): static
+    {
+        $this->request = $request;
+
+        return $this;
     }
 }
