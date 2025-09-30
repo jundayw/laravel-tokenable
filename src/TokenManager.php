@@ -3,6 +3,7 @@
 namespace Jundayw\Tokenable;
 
 use Closure;
+use Illuminate\Container\Container;
 use InvalidArgumentException;
 use Jundayw\Tokenable\Contracts\Token\Token;
 use Jundayw\Tokenable\Tokens\HashToken;
@@ -23,6 +24,12 @@ class TokenManager implements Contracts\Token\Factory
      * @var Token[]
      */
     protected array $drivers = [];
+
+    public function __construct(protected Container $app)
+    {
+        $this->extend('hash', fn() => $this->createHashTokenDriver('hash', $this->getConfig('hash')));
+        $this->extend('jwt', fn() => $this->createHashTokenDriver('jwt', $this->getConfig('jwt')));
+    }
 
     /**
      * Get a token driver instance.
@@ -79,12 +86,6 @@ class TokenManager implements Contracts\Token\Factory
 
         if (array_key_exists($driver, $this->customCreators)) {
             return call_user_func($this->customCreators[$driver], $config);
-        }
-
-        $driverMethod = 'create' . ucfirst($driver) . 'TokenDriver';
-
-        if (method_exists($this, $driverMethod)) {
-            return call_user_func([$this, $driverMethod], $driver, $config);
         }
 
         throw new InvalidArgumentException("Token driver [{$driver}] is not defined.");
@@ -144,9 +145,7 @@ class TokenManager implements Contracts\Token\Factory
      */
     public function normalizeDriverName(string $driver = null): ?string
     {
-        $drivers = array_merge(['hash', 'jwt'], array_keys($this->customCreators));
-
-        return in_array($driver, $drivers) ? $driver : null;
+        return array_key_exists($driver, $this->customCreators) ? $driver : null;
     }
 
     /**
