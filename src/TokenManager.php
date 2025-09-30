@@ -3,7 +3,6 @@
 namespace Jundayw\Tokenable;
 
 use Closure;
-use Illuminate\Container\Container;
 use InvalidArgumentException;
 use Jundayw\Tokenable\Contracts\Token\Token;
 use Jundayw\Tokenable\Tokens\HashToken;
@@ -25,7 +24,7 @@ class TokenManager implements Contracts\Token\Factory
      */
     protected array $drivers = [];
 
-    public function __construct(protected Container $app)
+    public function __construct()
     {
         $this->extend('hash', fn() => $this->createHashTokenDriver('hash', $this->getConfig('hash')));
         $this->extend('jwt', fn() => $this->createHashTokenDriver('jwt', $this->getConfig('jwt')));
