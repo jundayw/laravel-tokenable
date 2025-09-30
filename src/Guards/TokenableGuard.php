@@ -15,7 +15,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
 use Jundayw\Tokenable\Concerns\Auth\TokenableAuthHelpers;
 use Jundayw\Tokenable\Contracts\Auth\TokenableAuthGuard;
-use Jundayw\Tokenable\Contracts\Grant\Grant;
+use Jundayw\Tokenable\Contracts\Grant\Factory as GrantFactoryContract;
+use Jundayw\Tokenable\Contracts\Grant\TokenableGrant;
 use Jundayw\Tokenable\Contracts\Grant\TransientGrant;
 use Jundayw\Tokenable\Contracts\Tokenable;
 
@@ -26,8 +27,7 @@ class TokenableGuard implements Guard, TokenableAuthGuard
     public function __construct(
         protected string $name,
         protected Repository $config,
-        protected Grant $grant,
-        protected TransientGrant $transientGrant,
+        protected GrantFactoryContract $grantManager,
         protected Request $request,
         ?UserProvider $provider
     ) {
@@ -48,7 +48,7 @@ class TokenableGuard implements Guard, TokenableAuthGuard
             return $this->user;
         }
 
-        if (!is_null($this->user = $this->grant->findAccessToken($this->request))) {
+        if (!is_null($this->user = $this->getTokenableGrant()->findAccessToken($this->request))) {
             $this->fireAuthenticatedEvent($this->user);
         }
 
@@ -138,6 +138,38 @@ class TokenableGuard implements Guard, TokenableAuthGuard
         }
 
         return null;
+    }
+
+    /**
+     * Get the tokenable grant driver instance.
+     *
+     * This grant type manages access tokens and refresh tokens
+     * for tokenable models (e.g., users, clients, devices).
+     *
+     * @return TokenableGrant
+     */
+    public function getTokenableGrant(): TokenableGrant
+    {
+        return $this
+            ->grantManager
+            ->driver(TokenableGrant::class)
+            ->usingGuard($this);
+    }
+
+    /**
+     * Get the transient grant driver instance.
+     *
+     * This grant type issues short-lived authorization codes
+     * that can be exchanged for access tokens.
+     *
+     * @return TransientGrant
+     */
+    public function getTransientGrant(): TransientGrant
+    {
+        return $this
+            ->grantManager
+            ->driver(TransientGrant::class)
+            ->usingGuard($this);
     }
 
     /**
