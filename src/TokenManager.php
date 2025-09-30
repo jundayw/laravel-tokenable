@@ -46,16 +46,6 @@ class TokenManager implements Contracts\Token\Factory
     }
 
     /**
-     * Get the default driver name.
-     *
-     * @return string
-     */
-    public function getDefaultDriver(): string
-    {
-        return config('tokenable.default.driver', 'hash');
-    }
-
-    /**
      * Get the driver configuration.
      *
      * @param string $name
@@ -115,6 +105,16 @@ class TokenManager implements Contracts\Token\Factory
     public function createJwtTokenDriver(string $name, array $config): Token
     {
         return new JsonWebToken($name, $config);
+    }
+
+    /**
+     * Get the default driver name.
+     *
+     * @return string
+     */
+    public function getDefaultDriver(): string
+    {
+        return config('tokenable.default.driver', 'hash');
     }
 
     /**

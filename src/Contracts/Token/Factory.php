@@ -36,6 +36,13 @@ interface Factory
     public function createJwtTokenDriver(string $name, array $config): Token;
 
     /**
+     * Get the default driver name.
+     *
+     * @return string
+     */
+    public function getDefaultDriver(): string;
+
+    /**
      * Register a custom driver creator Closure.
      *
      * @param string  $driver
