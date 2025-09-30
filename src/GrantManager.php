@@ -3,9 +3,14 @@
 namespace Jundayw\Tokenable;
 
 use Closure;
+use Illuminate\Container\Container;
 use InvalidArgumentException;
+use Jundayw\Tokenable\Contracts\Auth\Authenticable;
+use Jundayw\Tokenable\Contracts\Blacklist;
 use Jundayw\Tokenable\Contracts\Grant\Grant;
-use Jundayw\Tokenable\Contracts\Grant\TokenableGrant;
+use Jundayw\Tokenable\Contracts\Whitelist;
+use Jundayw\Tokenable\Grants\TokenableGrant;
+use Jundayw\Tokenable\Grants\TransientGrant;
 
 class GrantManager implements Contracts\Grant\Factory
 {
@@ -22,6 +27,12 @@ class GrantManager implements Contracts\Grant\Factory
      * @var Grant[]
      */
     protected array $grants = [];
+
+    public function __construct(protected Container $app)
+    {
+        $this->extend(Contracts\Grant\TokenableGrant::class, fn() => $this->createTokenableGrantDriver());
+        $this->extend(Contracts\Grant\TransientGrant::class, fn() => $this->createTransientGrantDriver());
+    }
 
     /**
      * Get a grant instance.
@@ -56,13 +67,43 @@ class GrantManager implements Contracts\Grant\Factory
     }
 
     /**
+     * Create a tokenable grant based grant driver.
+     *
+     * @return Contracts\Grant\TokenableGrant
+     */
+    public function createTokenableGrantDriver(): Contracts\Grant\TokenableGrant
+    {
+        return new TokenableGrant(
+            $this->app[Authenticable::class],
+            $this->app[Contracts\Token\Factory::class],
+            $this->app[Blacklist::class],
+            $this->app[Whitelist::class],
+            $this->app['cache.store'],
+        );
+    }
+
+    /**
+     * Create a transient grant based grant driver.
+     *
+     * @return Contracts\Grant\TransientGrant
+     */
+    public function createTransientGrantDriver(): Contracts\Grant\TransientGrant
+    {
+        return new TransientGrant(
+            $this->app[Authenticable::class],
+            $this->app[Contracts\Token\Factory::class],
+            $this->app['cache.store'],
+        );
+    }
+
+    /**
      * Get the default driver name.
      *
      * @return string
      */
     public function getDefaultDriver(): string
     {
-        return TokenableGrant::class;
+        return Contracts\Grant\TokenableGrant::class;
     }
 
     /**

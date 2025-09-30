@@ -16,6 +16,20 @@ interface Factory
     public function driver(string $name = null): Grant;
 
     /**
+     * Create a tokenable grant based grant driver.
+     *
+     * @return TokenableGrant
+     */
+    public function createTokenableGrantDriver(): TokenableGrant;
+
+    /**
+     * Create a transient grant based grant driver.
+     *
+     * @return TransientGrant
+     */
+    public function createTransientGrantDriver(): TransientGrant;
+
+    /**
      * Get the default driver name.
      *
      * @return string
