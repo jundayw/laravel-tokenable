@@ -46,18 +46,6 @@ class TokenManager implements Contracts\Token\Factory
     }
 
     /**
-     * Get the driver configuration.
-     *
-     * @param string $name
-     *
-     * @return array|null
-     */
-    protected function getConfig(string $name): ?array
-    {
-        return config("tokenable.drivers.{$name}");
-    }
-
-    /**
      * Resolve the given token driver instance.
      *
      * If no driver name is provided, the default driver will be used.
@@ -75,7 +63,7 @@ class TokenManager implements Contracts\Token\Factory
         }
 
         if (array_key_exists($driver, $this->customCreators)) {
-            return call_user_func($this->customCreators[$driver], $config);
+            return call_user_func($this->customCreators[$driver], $driver, $config);
         }
 
         throw new InvalidArgumentException("Token driver [{$driver}] is not defined.");
@@ -105,6 +93,18 @@ class TokenManager implements Contracts\Token\Factory
     public function createJwtTokenDriver(string $name, array $config): Token
     {
         return new JsonWebToken($name, $config);
+    }
+
+    /**
+     * Get the driver configuration.
+     *
+     * @param string $name
+     *
+     * @return array|null
+     */
+    protected function getConfig(string $name): ?array
+    {
+        return config("tokenable.drivers.{$name}");
     }
 
     /**
