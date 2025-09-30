@@ -2,47 +2,69 @@
 
 namespace Jundayw\Tokenable\Contracts\Grant;
 
-use Closure;
-
 interface Factory
 {
     /**
-     * Get a grant instance.
+     * Get the AccessTokenGrant instance.
      *
-     * @param string|null $name
-     *
-     * @return Grant
+     * @return AccessTokenGrant
      */
-    public function driver(string $name = null): Grant;
+    public function getAccessTokenGrant(): AccessTokenGrant;
 
     /**
-     * Create a tokenable grant based grant driver.
+     * Set the AccessTokenGrant instance.
      *
-     * @return TokenableGrant
-     */
-    public function createTokenableGrantDriver(): TokenableGrant;
-
-    /**
-     * Create a transient grant based grant driver.
-     *
-     * @return TransientGrant
-     */
-    public function createTransientGrantDriver(): TransientGrant;
-
-    /**
-     * Get the default driver name.
-     *
-     * @return string
-     */
-    public function getDefaultDriver(): string;
-
-    /**
-     * Register a custom driver creator Closure.
-     *
-     * @param string  $driver
-     * @param Closure $callback
+     * @param AccessTokenGrant $accessTokenGrant
      *
      * @return static
      */
-    public function extend(string $driver, Closure $callback): static;
+    public function setAccessTokenGrant(AccessTokenGrant $accessTokenGrant): static;
+
+    /**
+     * Get the AuthorizationCodeGrant instance.
+     *
+     * @return AuthorizationCodeGrant
+     */
+    public function getAuthorizationCodeGrant(): AuthorizationCodeGrant;
+
+    /**
+     * Set the AuthorizationCodeGrant instance.
+     *
+     * @param AuthorizationCodeGrant $authorizationCodeGrant
+     *
+     * @return $this
+     */
+    public function setAuthorizationCodeGrant(AuthorizationCodeGrant $authorizationCodeGrant): static;
+
+    /**
+     * Get the RefreshTokenGrant instance.
+     *
+     * @return RefreshTokenGrant
+     */
+    public function getRefreshTokenGrant(): RefreshTokenGrant;
+
+    /**
+     * Set the RefreshTokenGrant instance.
+     *
+     * @param RefreshTokenGrant $refreshTokenGrant
+     *
+     * @return static
+     */
+    public function setRefreshTokenGrant(RefreshTokenGrant $refreshTokenGrant): static;
+
+    /**
+     * Get the RevokeTokenGrant instance.
+     *
+     * @return RevokeTokenGrant
+     */
+    public function getRevokeTokenGrant(): RevokeTokenGrant;
+
+    /**
+     * Set the RevokeTokenGrant instance.
+     *
+     * @param RevokeTokenGrant $revokeTokenGrant
+     *
+     * @return static
+     */
+    public function setRevokeTokenGrant(RevokeTokenGrant $revokeTokenGrant): static;
 }
