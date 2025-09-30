@@ -10,10 +10,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Jundayw\Tokenable\Contracts\Auth\Authenticable;
 use Jundayw\Tokenable\Contracts\Blacklist;
-use Jundayw\Tokenable\Contracts\Token\Token;
 use Jundayw\Tokenable\Contracts\Whitelist;
-use Jundayw\Tokenable\Grants\TokenableGrant;
-use Jundayw\Tokenable\Grants\TransientGrant;
 use Jundayw\Tokenable\Guards\TokenableGuard;
 use Jundayw\Tokenable\Middleware\CheckForAnyScope;
 use Jundayw\Tokenable\Middleware\CheckScopes;
@@ -74,8 +71,8 @@ class TokenableServiceProvider extends ServiceProvider
      */
     protected function registerTokenProvider(): void
     {
-        $this->app->singleton(Contracts\Token\Factory::class, static fn() => new TokenManager);
-        $this->app->singleton(Token::class, static fn($app) => $app[Contracts\Token\Factory::class]->driver());
+        $this->app->singleton(Contracts\Token\Factory::class, static fn($app) => new TokenManager($app));
+        $this->app->singleton(Contracts\Token\Token::class, static fn($app) => $app[Contracts\Token\Factory::class]->driver());
     }
 
     /**
@@ -120,19 +117,7 @@ class TokenableServiceProvider extends ServiceProvider
     protected function registerGrantProvider(): void
     {
         $this->app->singleton(Contracts\Grant\Factory::class, static function ($app) {
-            return tap(new GrantManager, fn(Contracts\Grant\Factory $grant) => $grant
-                ->extend(Contracts\Grant\TokenableGrant::class, fn() => new TokenableGrant(
-                    $app[Authenticable::class],
-                    $app[Contracts\Token\Factory::class],
-                    $app[Blacklist::class],
-                    $app[Whitelist::class],
-                    $app['cache.store'],
-                ))
-                ->extend(Contracts\Grant\TransientGrant::class, fn() => new TransientGrant(
-                    $app[Authenticable::class],
-                    $app[Contracts\Token\Factory::class],
-                    $app['cache.store'],
-                )));
+            return new GrantManager($app);
         });
     }
 
