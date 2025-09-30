@@ -3,7 +3,7 @@
 namespace Jundayw\Tokenable\Concerns\Auth;
 
 use Illuminate\Contracts\Auth\Authenticatable;
-use Jundayw\Tokenable\Contracts\Grant\Grant;
+use Jundayw\Tokenable\Contracts\Grant\TokenableGrant;
 use Jundayw\Tokenable\Contracts\Grant\TransientGrant;
 
 trait TokenableAuthHelpers
@@ -18,7 +18,7 @@ trait TokenableAuthHelpers
     public function onceUsingId(mixed $id): TransientGrant|null
     {
         if (!is_null($user = $this->provider->retrieveById($id))) {
-            return $this->setUser($user)->transientGrant;
+            return $this->setUser($user)->getTransientGrant();
         }
 
         return null;
@@ -34,7 +34,7 @@ trait TokenableAuthHelpers
     public function once(array $credentials = []): TransientGrant|null
     {
         if (!is_null($user = $this->provider->retrieveByCredentials($credentials))) {
-            return $this->setUser($user)->transientGrant;
+            return $this->setUser($user)->getTransientGrant();
         }
 
         return null;
@@ -45,9 +45,9 @@ trait TokenableAuthHelpers
      *
      * @param array $credentials
      *
-     * @return Grant|null
+     * @return TokenableGrant|null
      */
-    public function attempt(array $credentials = []): Grant|null
+    public function attempt(array $credentials = []): TokenableGrant|null
     {
         if (!is_null($user = $this->provider->retrieveByCredentials($credentials))) {
             return $this->login($user);
@@ -61,9 +61,9 @@ trait TokenableAuthHelpers
      *
      * @param mixed $id
      *
-     * @return Grant|null
+     * @return TokenableGrant|null
      */
-    public function loginUsingId(mixed $id): Grant|null
+    public function loginUsingId(mixed $id): TokenableGrant|null
     {
         if (!is_null($user = $this->provider->retrieveById($id))) {
             return $this->login($user);
@@ -77,13 +77,13 @@ trait TokenableAuthHelpers
      *
      * @param Authenticatable $user
      *
-     * @return Grant|null
+     * @return TokenableGrant|null
      */
-    public function login(Authenticatable $user): Grant|null
+    public function login(Authenticatable $user): TokenableGrant|null
     {
         $this->setUser($user)->fireLoginEvent($user);
 
-        return $this->grant;
+        return $this->getTokenableGrant();
     }
 
     /**
