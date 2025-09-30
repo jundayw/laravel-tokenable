@@ -7,7 +7,7 @@ use Illuminate\Contracts\Config\Repository;
 use Illuminate\Support\Facades\Cookie as CookieJar;
 use Illuminate\Support\Str;
 use Jundayw\Tokenable\Contracts\Auth\Authenticable;
-use Jundayw\Tokenable\Contracts\Token as TokenContract;
+use Jundayw\Tokenable\Contracts\Token\Token as TokenContract;
 use Jundayw\Tokenable\Contracts\Tokenable as TokenableContract;
 use Jundayw\Tokenable\Tokenable;
 use Symfony\Component\HttpFoundation\Cookie;
