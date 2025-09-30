@@ -4,11 +4,11 @@ namespace Jundayw\Tokenable;
 
 use Closure;
 use InvalidArgumentException;
-use Jundayw\Tokenable\Contracts\Token;
+use Jundayw\Tokenable\Contracts\Token\Token;
 use Jundayw\Tokenable\Tokens\HashToken;
 use Jundayw\Tokenable\Tokens\JsonWebToken;
 
-class TokenManager implements Contracts\TokenManager
+class TokenManager implements Contracts\Token\Factory
 {
     /**
      * The registered custom driver creators.
@@ -18,7 +18,7 @@ class TokenManager implements Contracts\TokenManager
     protected array $customCreators = [];
 
     /**
-     * The array of created "drivers".
+     * The array of resolved token drivers.
      *
      * @var Token[]
      */
@@ -31,7 +31,7 @@ class TokenManager implements Contracts\TokenManager
      *
      * @return Token
      */
-    public function driver(?string $name = null): Token
+    public function driver(string $name = null): Token
     {
         $name = $name ?: $this->getDefaultDriver();
 
@@ -39,7 +39,7 @@ class TokenManager implements Contracts\TokenManager
     }
 
     /**
-     * Get the default authentication driver name.
+     * Get the default driver name.
      *
      * @return string
      */

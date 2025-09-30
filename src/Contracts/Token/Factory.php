@@ -13,7 +13,7 @@ interface Factory
      *
      * @return Token
      */
-    public function driver(?string $name = null): Token;
+    public function driver(string $name = null): Token;
 
     /**
      * Create a hash token based token driver.
