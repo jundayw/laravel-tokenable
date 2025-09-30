@@ -1,14 +1,13 @@
 <?php
 
-namespace Jundayw\Tokenable\Grants;
+namespace Jundayw\Tokenable;
 
 use Closure;
 use InvalidArgumentException;
-use Jundayw\Tokenable\Contracts\Grant\Factory;
 use Jundayw\Tokenable\Contracts\Grant\Grant;
 use Jundayw\Tokenable\Contracts\Grant\TokenableGrant;
 
-class GrantManager implements Factory
+class GrantManager implements Contracts\Grant\Factory
 {
     /**
      * The registered custom driver creators.
