@@ -1,10 +1,10 @@
 <?php
 
-namespace Jundayw\Tokenable\Contracts;
+namespace Jundayw\Tokenable\Contracts\Token;
 
 use Closure;
 
-interface TokenManager
+interface Factory
 {
     /**
      * Get a token driver instance.
