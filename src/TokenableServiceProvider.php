@@ -72,7 +72,7 @@ class TokenableServiceProvider extends ServiceProvider
     protected function registerTokenProvider(): void
     {
         $this->app->singleton(Contracts\Token\Factory::class, static fn($app) => new TokenManager($app));
-        $this->app->singleton(Contracts\Token\Token::class, static fn($app) => $app[Contracts\Token\Factory::class]->driver());
+        $this->app->bind(Contracts\Token\Token::class, static fn($app) => $app[Contracts\Token\Factory::class]->driver());
     }
 
     /**
@@ -93,14 +93,14 @@ class TokenableServiceProvider extends ServiceProvider
             'cache.stores.whitelist' => $whitelist ?: $default + ['prefix' => $prefix . ':whitelist'],
         ]);
 
-        $this->app->singleton(Blacklist::class, static function ($app) {
+        $this->app->bind(Blacklist::class, static function ($app) {
             $store   = $app['cache']->store('blacklist')->getStore();
             $enabled = config('tokenable.cache.blacklist_enabled', false);
             return tap(new BlacklistRepository($store), static function (Blacklist $blacklist) use ($enabled) {
                 $blacklist->setBlacklistEnabled($enabled);
             });
         });
-        $this->app->singleton(Whitelist::class, static function ($app) {
+        $this->app->bind(Whitelist::class, static function ($app) {
             $store   = $app['cache']->store('whitelist')->getStore();
             $enabled = config('tokenable.cache.whitelist_enabled', false);
             return tap(new WhitelistRepository($store), static function (Whitelist $whitelist) use ($enabled) {
