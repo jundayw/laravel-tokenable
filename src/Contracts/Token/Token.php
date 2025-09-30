@@ -1,11 +1,12 @@
 <?php
 
-namespace Jundayw\Tokenable\Contracts;
+namespace Jundayw\Tokenable\Contracts\Token;
 
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Jundayw\Tokenable\Contracts\Auth\Authenticable;
+use Jundayw\Tokenable\Contracts\Tokenable;
 use Symfony\Component\HttpFoundation\Cookie;
 
 interface Token extends Arrayable, Jsonable
