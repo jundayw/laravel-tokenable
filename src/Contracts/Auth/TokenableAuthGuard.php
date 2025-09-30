@@ -4,8 +4,9 @@ namespace Jundayw\Tokenable\Contracts\Auth;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
-use Jundayw\Tokenable\Contracts\Grant\TokenableGrant;
-use Jundayw\Tokenable\Contracts\Grant\TransientGrant;
+use Jundayw\Tokenable\Contracts\Grant\AccessTokenGrant;
+use Jundayw\Tokenable\Contracts\Grant\AuthorizationCodeGrant;
+use Jundayw\Tokenable\Contracts\Token\Token;
 use Jundayw\Tokenable\Contracts\Tokenable;
 
 interface TokenableAuthGuard
@@ -15,45 +16,45 @@ interface TokenableAuthGuard
      *
      * @param mixed $id
      *
-     * @return TransientGrant|null
+     * @return AuthorizationCodeGrant|null
      */
-    public function onceUsingId(mixed $id): TransientGrant|null;
+    public function onceUsingId(mixed $id): AuthorizationCodeGrant|null;
 
     /**
      * Log a user into the application without maintaining session state.
      *
      * @param array $credentials
      *
-     * @return TransientGrant|null
+     * @return AuthorizationCodeGrant|null
      */
-    public function once(array $credentials = []): TransientGrant|null;
+    public function once(array $credentials = []): AuthorizationCodeGrant|null;
 
     /**
      * Attempt to authenticate a user using the given credentials.
      *
      * @param array $credentials
      *
-     * @return TokenableGrant|null
+     * @return AccessTokenGrant|null
      */
-    public function attempt(array $credentials = []): TokenableGrant|null;
+    public function attempt(array $credentials = []): AccessTokenGrant|null;
 
     /**
      * Log the given user ID into the application.
      *
      * @param mixed $id
      *
-     * @return TokenableGrant|null
+     * @return AccessTokenGrant|null
      */
-    public function loginUsingId(mixed $id): TokenableGrant|null;
+    public function loginUsingId(mixed $id): AccessTokenGrant|null;
 
     /**
      * Log a user into the application.
      *
      * @param Authenticatable $user
      *
-     * @return TokenableGrant|null
+     * @return AccessTokenGrant|null
      */
-    public function login(Authenticatable $user): TokenableGrant|null;
+    public function login(Authenticatable $user): AccessTokenGrant|null;
 
     /**
      * Log the user out of the application.
@@ -94,22 +95,16 @@ interface TokenableAuthGuard
     public function user(): Authenticatable|Tokenable|Model|null;
 
     /**
-     * Get the tokenable grant driver instance.
+     * Revoke (invalidate) the both access and refresh tokens by access token.
      *
-     * This grant type manages access tokens and refresh tokens
-     * for tokenable models (e.g., users, clients, devices).
-     *
-     * @return TokenableGrant
+     * @return bool
      */
-    public function getTokenableGrant(): TokenableGrant;
+    public function revokeToken(): bool;
 
     /**
-     * Get the transient grant driver instance.
+     * Refresh the access and refresh tokens using the current refresh token.
      *
-     * This grant type issues short-lived authorization codes
-     * that can be exchanged for access tokens.
-     *
-     * @return TransientGrant
+     * @return Token|null
      */
-    public function getTransientGrant(): TransientGrant;
+    public function refreshToken(): ?Token;
 }

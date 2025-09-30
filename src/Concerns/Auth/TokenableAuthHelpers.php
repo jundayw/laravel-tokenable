@@ -3,8 +3,8 @@
 namespace Jundayw\Tokenable\Concerns\Auth;
 
 use Illuminate\Contracts\Auth\Authenticatable;
-use Jundayw\Tokenable\Contracts\Grant\TokenableGrant;
-use Jundayw\Tokenable\Contracts\Grant\TransientGrant;
+use Jundayw\Tokenable\Contracts\Grant\AccessTokenGrant;
+use Jundayw\Tokenable\Contracts\Grant\AuthorizationCodeGrant;
 
 trait TokenableAuthHelpers
 {
@@ -13,12 +13,12 @@ trait TokenableAuthHelpers
      *
      * @param mixed $id
      *
-     * @return TransientGrant|null
+     * @return AuthorizationCodeGrant|null
      */
-    public function onceUsingId(mixed $id): TransientGrant|null
+    public function onceUsingId(mixed $id): AuthorizationCodeGrant|null
     {
         if (!is_null($user = $this->provider->retrieveById($id))) {
-            return $this->setUser($user)->getTransientGrant();
+            return $this->setUser($user)->getAuthorizationCodeGrant();
         }
 
         return null;
@@ -29,12 +29,12 @@ trait TokenableAuthHelpers
      *
      * @param array $credentials
      *
-     * @return TransientGrant|null
+     * @return AuthorizationCodeGrant|null
      */
-    public function once(array $credentials = []): TransientGrant|null
+    public function once(array $credentials = []): AuthorizationCodeGrant|null
     {
         if (!is_null($user = $this->provider->retrieveByCredentials($credentials))) {
-            return $this->setUser($user)->getTransientGrant();
+            return $this->setUser($user)->getAuthorizationCodeGrant();
         }
 
         return null;
@@ -45,9 +45,9 @@ trait TokenableAuthHelpers
      *
      * @param array $credentials
      *
-     * @return TokenableGrant|null
+     * @return AccessTokenGrant|null
      */
-    public function attempt(array $credentials = []): TokenableGrant|null
+    public function attempt(array $credentials = []): AccessTokenGrant|null
     {
         if (!is_null($user = $this->provider->retrieveByCredentials($credentials))) {
             return $this->login($user);
@@ -61,9 +61,9 @@ trait TokenableAuthHelpers
      *
      * @param mixed $id
      *
-     * @return TokenableGrant|null
+     * @return AccessTokenGrant|null
      */
-    public function loginUsingId(mixed $id): TokenableGrant|null
+    public function loginUsingId(mixed $id): AccessTokenGrant|null
     {
         if (!is_null($user = $this->provider->retrieveById($id))) {
             return $this->login($user);
@@ -77,13 +77,13 @@ trait TokenableAuthHelpers
      *
      * @param Authenticatable $user
      *
-     * @return TokenableGrant|null
+     * @return AccessTokenGrant|null
      */
-    public function login(Authenticatable $user): TokenableGrant|null
+    public function login(Authenticatable $user): AccessTokenGrant|null
     {
         $this->setUser($user)->fireLoginEvent($user);
 
-        return $this->getTokenableGrant();
+        return $this->getAccessTokenGrant();
     }
 
     /**
