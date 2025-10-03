@@ -22,7 +22,6 @@ use Jundayw\Tokenable\Grants\AuthorizationCodeGrant;
 use Jundayw\Tokenable\Guards\TokenableGuard;
 use Jundayw\Tokenable\Middleware\CheckForAnyScope;
 use Jundayw\Tokenable\Middleware\CheckScopes;
-use Jundayw\Tokenable\Middleware\CreateFreshTokenWithCookie;
 use Jundayw\Tokenable\Repositories\BlacklistRepository;
 use Jundayw\Tokenable\Repositories\WhitelistRepository;
 
@@ -54,9 +53,8 @@ class TokenableServiceProvider extends ServiceProvider
         $this->registerGrantProvider();
 
         $this->aliasMiddleware([
-            'scopes'              => CheckScopes::class,
-            'scope'               => CheckForAnyScope::class,
-            'auth.cookie.refresh' => CreateFreshTokenWithCookie::class,
+            'scopes' => CheckScopes::class,
+            'scope'  => CheckForAnyScope::class,
         ]);
     }
 
