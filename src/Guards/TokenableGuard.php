@@ -84,7 +84,9 @@ class TokenableGuard implements TokenableAuthGuard
      */
     public function refreshToken(): ?Token
     {
-        return $this->getAccessTokenGrant()->refreshToken($this->request);
+        return tap($this->getAccessTokenGrant()->refreshToken($this->request), function (Token $token = null) {
+            $this->user = $token ? $this->getAccessTokenGrant()->getTokenable() : null;
+        });
     }
 
     /**
@@ -164,7 +166,7 @@ class TokenableGuard implements TokenableAuthGuard
      */
     protected function getAccessTokenGrant(): AccessTokenGrant
     {
-        return $this->grant->getAccessTokenGrant()->shouldUse($this->getName());
+        return $this->grant->getAccessTokenGrant()->withGuard($this);
     }
 
     /**
