@@ -3,6 +3,7 @@
 namespace Jundayw\Tokenable\Grants;
 
 use Illuminate\Http\Request;
+use Jundayw\Tokenable\Concerns\Grant\AccessTokenHelper;
 use Jundayw\Tokenable\Contracts\Grant\AccessTokenGrant as AccessTokenGrantContract;
 use Jundayw\Tokenable\Contracts\Token\Token;
 use Jundayw\Tokenable\Contracts\Tokenable as TokenableContract;
@@ -13,6 +14,8 @@ use Jundayw\Tokenable\Events\AccessTokenRevoked;
 
 class AccessTokenGrant extends Grant implements AccessTokenGrantContract
 {
+    use AccessTokenHelper;
+
     /**
      * Attempt to resolve the authenticated tokenable model from the given request.
      *
@@ -86,7 +89,7 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
                 'access_token'  => $token->getAccessToken(),
                 'refresh_token' => $token->getRefreshToken(),
             ])->save()) {
-                event(new AccessTokenCreated($this->resolveGuard()->getConfig(), $authentication, $tokenable, $token));
+                event(new AccessTokenCreated($this->getGuard()->getConfig(), $authentication, $tokenable, $token));
             }
         });
     }
