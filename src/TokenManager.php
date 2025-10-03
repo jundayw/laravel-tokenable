@@ -27,7 +27,7 @@ class TokenManager implements Contracts\Token\Factory
     public function __construct()
     {
         $this->extend('hash', fn() => $this->createHashTokenDriver('hash', $this->getConfig('hash')));
-        $this->extend('jwt', fn() => $this->createHashTokenDriver('jwt', $this->getConfig('jwt')));
+        $this->extend('jwt', fn() => $this->createJwtTokenDriver('jwt', $this->getConfig('jwt')));
     }
 
     /**
