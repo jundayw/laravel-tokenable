@@ -3,13 +3,15 @@
 namespace Jundayw\Tokenable\Contracts\Auth;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\Eloquent\Model;
 use Jundayw\Tokenable\Contracts\Grant\AccessTokenGrant;
 use Jundayw\Tokenable\Contracts\Grant\AuthorizationCodeGrant;
 use Jundayw\Tokenable\Contracts\Token\Token;
 use Jundayw\Tokenable\Contracts\Tokenable;
 
-interface TokenableAuthGuard
+interface TokenableAuthGuard extends Guard
 {
     /**
      * Log the given user ID into the application without maintaining session state.
@@ -73,12 +75,9 @@ interface TokenableAuthGuard
     /**
      * Get the specified configuration value.
      *
-     * @param string     $key
-     * @param mixed|null $default
-     *
-     * @return mixed
+     * @return Repository
      */
-    public function getConfig(string $key, mixed $default = null): mixed;
+    public function getConfig(): Repository;
 
     /**
      * Return the currently cached user.

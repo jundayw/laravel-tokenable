@@ -18,7 +18,7 @@ trait TokenableAuthHelpers
     public function onceUsingId(mixed $id): AuthorizationCodeGrant|null
     {
         if (!is_null($user = $this->provider->retrieveById($id))) {
-            return $this->setUser($user)->getAuthorizationCodeGrant();
+            return $this->setUser($user)->getAuthorizationCodeGrant()->setTokenable($user);
         }
 
         return null;
@@ -34,7 +34,7 @@ trait TokenableAuthHelpers
     public function once(array $credentials = []): AuthorizationCodeGrant|null
     {
         if (!is_null($user = $this->provider->retrieveByCredentials($credentials))) {
-            return $this->setUser($user)->getAuthorizationCodeGrant();
+            return $this->setUser($user)->getAuthorizationCodeGrant()->setTokenable($user);
         }
 
         return null;
@@ -83,7 +83,7 @@ trait TokenableAuthHelpers
     {
         $this->setUser($user)->fireLoginEvent($user);
 
-        return $this->getAccessTokenGrant();
+        return $this->getAccessTokenGrant()->setTokenable($user);
     }
 
     /**
@@ -97,10 +97,6 @@ trait TokenableAuthHelpers
             return false;
         }
 
-        $user = $this->user;
-
-        $this->forgetUser()->fireLogoutEvent($user);
-
-        return true;
+        return with($this->user, fn($user) => tap($this->revokeToken(), fn() => $this->forgetUser()->fireLogoutEvent($user)));
     }
 }

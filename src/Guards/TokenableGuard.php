@@ -7,7 +7,6 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\Eloquent\Model;
@@ -18,12 +17,10 @@ use Jundayw\Tokenable\Contracts\Auth\TokenableAuthGuard;
 use Jundayw\Tokenable\Contracts\Grant\AccessTokenGrant;
 use Jundayw\Tokenable\Contracts\Grant\AuthorizationCodeGrant;
 use Jundayw\Tokenable\Contracts\Grant\Factory as GrantFactoryContract;
-use Jundayw\Tokenable\Contracts\Grant\RefreshTokenGrant;
-use Jundayw\Tokenable\Contracts\Grant\RevokeTokenGrant;
 use Jundayw\Tokenable\Contracts\Token\Token;
 use Jundayw\Tokenable\Contracts\Tokenable;
 
-class TokenableGuard implements Guard, TokenableAuthGuard
+class TokenableGuard implements TokenableAuthGuard
 {
     use GuardHelpers, TokenableAuthHelpers, Macroable;
 
@@ -77,11 +74,7 @@ class TokenableGuard implements Guard, TokenableAuthGuard
      */
     public function revokeToken(): bool
     {
-        if ($this->guest()) {
-            return false;
-        }
-
-        return $this->forgetUser()->getRevokeTokenGrant()->revoke($this->request);
+        return $this->getAccessTokenGrant()->revokeToken($this->request);
     }
 
     /**
@@ -91,7 +84,7 @@ class TokenableGuard implements Guard, TokenableAuthGuard
      */
     public function refreshToken(): ?Token
     {
-        return $this->getRefreshTokenGrant()->refresh($this->request);
+        return $this->getAccessTokenGrant()->refreshToken($this->request);
     }
 
     /**
@@ -143,14 +136,11 @@ class TokenableGuard implements Guard, TokenableAuthGuard
     /**
      * Get the specified configuration value.
      *
-     * @param string     $key
-     * @param mixed|null $default
-     *
-     * @return mixed
+     * @return Repository
      */
-    public function getConfig(string $key, mixed $default = null): mixed
+    public function getConfig(): Repository
     {
-        return $this->config->get($key, $default);
+        return $this->config;
     }
 
     /**
@@ -174,7 +164,7 @@ class TokenableGuard implements Guard, TokenableAuthGuard
      */
     protected function getAccessTokenGrant(): AccessTokenGrant
     {
-        return $this->grant->getAccessTokenGrant();
+        return $this->grant->getAccessTokenGrant()->shouldUse($this->getName());
     }
 
     /**
@@ -185,26 +175,6 @@ class TokenableGuard implements Guard, TokenableAuthGuard
     protected function getAuthorizationCodeGrant(): AuthorizationCodeGrant
     {
         return $this->grant->getAuthorizationCodeGrant();
-    }
-
-    /**
-     * Get the RefreshTokenGrant instance.
-     *
-     * @return RefreshTokenGrant
-     */
-    protected function getRefreshTokenGrant(): RefreshTokenGrant
-    {
-        return $this->grant->getRefreshTokenGrant();
-    }
-
-    /**
-     * Get the RevokeTokenGrant instance.
-     *
-     * @return RevokeTokenGrant
-     */
-    protected function getRevokeTokenGrant(): RevokeTokenGrant
-    {
-        return $this->grant->getRevokeTokenGrant();
     }
 
     /**
