@@ -93,10 +93,10 @@ trait TokenableAuthHelpers
      */
     public function logout(): bool
     {
-        if ($this->guest()) {
+        if (is_null($user = $this->user())) {
             return false;
         }
 
-        return with($this->user, fn($user) => tap($this->revokeToken(), fn() => $this->forgetUser()->fireLogoutEvent($user)));
+        return tap($this->revokeToken(), fn() => $this->forgetUser()->fireLogoutEvent($user));
     }
 }
