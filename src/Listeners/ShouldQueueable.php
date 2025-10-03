@@ -1,0 +1,49 @@
+<?php
+
+namespace Jundayw\Tokenable\Listeners;
+
+use Illuminate\Contracts\Queue\ShouldQueue;
+
+abstract class ShouldQueueable implements ShouldQueue
+{
+    /**
+     * Get the name of the listener's queue connection.
+     *
+     * @return string
+     */
+    public function viaConnection(): string
+    {
+        return config('tokenable.queue.connection');
+    }
+
+    /**
+     * Get the name of the listener's queue.
+     *
+     * @return string
+     */
+    public function viaQueue(): string
+    {
+        return config('tokenable.queue.queue');
+    }
+
+    /**
+     * Handle the event.
+     *
+     * @param $event
+     *
+     * @return void
+     */
+    abstract public function handle($event): void;
+
+    /**
+     * Determine whether the listener should be queued.
+     *
+     * @param $event
+     *
+     * @return bool
+     */
+    public function shouldQueue($event): bool
+    {
+        return true;
+    }
+}
