@@ -14,15 +14,11 @@ use Jundayw\Tokenable\Contracts\Grant\AccessTokenGrant as AccessTokenGrantContra
 use Jundayw\Tokenable\Contracts\Grant\AuthorizationCodeGrant as AuthorizationCodeGrantContract;
 use Jundayw\Tokenable\Contracts\Grant\Factory as GrantFactoryContract;
 use Jundayw\Tokenable\Contracts\Grant\Grant;
-use Jundayw\Tokenable\Contracts\Grant\RefreshTokenGrant as RefreshTokenGrantContract;
-use Jundayw\Tokenable\Contracts\Grant\RevokeTokenGrant as RevokeTokenGrantContract;
 use Jundayw\Tokenable\Contracts\Token\Factory as TokenFactoryContract;
 use Jundayw\Tokenable\Contracts\Token\Token;
 use Jundayw\Tokenable\Contracts\Whitelist;
 use Jundayw\Tokenable\Grants\AccessTokenGrant;
 use Jundayw\Tokenable\Grants\AuthorizationCodeGrant;
-use Jundayw\Tokenable\Grants\RefreshTokenGrant;
-use Jundayw\Tokenable\Grants\RevokeTokenGrant;
 use Jundayw\Tokenable\Guards\TokenableGuard;
 use Jundayw\Tokenable\Middleware\CheckForAnyScope;
 use Jundayw\Tokenable\Middleware\CheckScopes;
@@ -130,22 +126,13 @@ class TokenableServiceProvider extends ServiceProvider
     {
         $this->app->singleton(AccessTokenGrantContract::class, static fn() => new AccessTokenGrant);
         $this->app->singleton(AuthorizationCodeGrantContract::class, static fn() => new AuthorizationCodeGrant);
-        $this->app->singleton(RefreshTokenGrantContract::class, static fn() => new RefreshTokenGrant);
-        $this->app->singleton(RevokeTokenGrantContract::class, static fn() => new RevokeTokenGrant);
-        $this->app->afterResolving(Grant::class, static function (Grant $grant, $app) {
-            $grant
-                ->setAuthentication($app[Authenticable::class])
-                ->setTokenManager($app[TokenFactoryContract::class])
-                ->setBlacklist($app[Blacklist::class])
-                ->setWhitelist($app[Whitelist::class])
-                ->setRepository($app['cache.store']);
-        });
-        $this->app->afterResolving(AccessTokenGrantContract::class, static function (AccessTokenGrantContract $grant, $app) {
-            $grant->setAuthorizationCodeGrant($app[AuthorizationCodeGrantContract::class]);
-        });
-        $this->app->afterResolving(AuthorizationCodeGrantContract::class, static function (AuthorizationCodeGrantContract $grant, $app) {
-            $grant->setAccessTokenGrant($app[AccessTokenGrantContract::class]);
-        });
+        $this->app->afterResolving(Grant::class, static fn(Grant $grant, $app) => $grant
+            ->setAuthentication($app[Authenticable::class])
+            ->setTokenManager($app[TokenFactoryContract::class])
+            ->setBlacklist($app[Blacklist::class])
+            ->setWhitelist($app[Whitelist::class])
+            ->setRepository($app['cache.store'])
+        );
         $this->app->singleton(GrantFactoryContract::class, GrantManager::class);
     }
 
