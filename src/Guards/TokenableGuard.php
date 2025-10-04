@@ -176,7 +176,7 @@ class TokenableGuard implements TokenableAuthGuard
      */
     protected function getAuthorizationCodeGrant(): AuthorizationCodeGrant
     {
-        return $this->grant->getAuthorizationCodeGrant();
+        return $this->grant->getAuthorizationCodeGrant()->withGuard($this);
     }
 
     /**

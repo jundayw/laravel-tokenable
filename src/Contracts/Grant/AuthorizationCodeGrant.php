@@ -2,10 +2,31 @@
 
 namespace Jundayw\Tokenable\Contracts\Grant;
 
+use Illuminate\Http\Request;
 use Jundayw\Tokenable\Contracts\Token\Token;
 
 interface AuthorizationCodeGrant extends Grant
 {
+    /**
+     * Log the given auth code into the application.
+     *
+     * @param Request $request
+     *
+     * @return static|null
+     */
+    public function fromAuthCode(Request $request): ?static;
+
+    /**
+     * Create a new access token for the user.
+     *
+     * @param string $name
+     * @param string $platform
+     * @param array  $scopes
+     *
+     * @return Token|null
+     */
+    public function createToken(string $name, string $platform = 'default', array $scopes = []): ?Token;
+
     /**
      * Create a new authorization code token for the current tokenable entity.
      *

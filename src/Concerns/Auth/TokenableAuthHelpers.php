@@ -41,6 +41,21 @@ trait TokenableAuthHelpers
     }
 
     /**
+     * Log the given auth code into the application.
+     *
+     * @return AuthorizationCodeGrant|null
+     */
+    public function fromAuthCode(): AuthorizationCodeGrant|null
+    {
+        if (!is_null($user = $this->getAuthorizationCodeGrant()->fromAuthCode($this->request)?->getTokenable())) {
+            return $this->setUser($user)->getAuthorizationCodeGrant();
+
+        }
+
+        return null;
+    }
+
+    /**
      * Attempt to authenticate a user using the given credentials.
      *
      * @param array $credentials
@@ -77,35 +92,13 @@ trait TokenableAuthHelpers
      *
      * @param Authenticatable $user
      *
-     * @return AccessTokenGrant|null
+     * @return AccessTokenGrant
      */
-    public function login(Authenticatable $user): AccessTokenGrant|null
+    public function login(Authenticatable $user): AccessTokenGrant
     {
         $this->setUser($user)->fireLoginEvent($user);
 
         return $this->getAccessTokenGrant()->setTokenable($user);
-    }
-
-    /**
-     * Log the given auth code into the application.
-     *
-     * @param string $authCode
-     *
-     * @return AccessTokenGrant|null
-     */
-    public function fromAuthCode(string $authCode): AccessTokenGrant|null
-    {
-        $authCode  = $this->getAccessTokenGrant()->getTokenManager()->driver(
-            $this->getAccessTokenGrant()->getTokenManager()->normalizeDriverName($this->request->getUser())
-        )->setAuthorizationCode($authCode);
-        $authCode  = $authCode->getAuthorizationCode();
-        $tokenable = $this->getAccessTokenGrant()->getRepository()->pull("auth_code_{$authCode}");
-
-        if (is_null($tokenable)) {
-            return null;
-        }
-
-        return $this->getAccessTokenGrant()->setTokenable($tokenable);
     }
 
     /**

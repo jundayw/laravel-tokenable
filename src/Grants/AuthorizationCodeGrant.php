@@ -2,11 +2,58 @@
 
 namespace Jundayw\Tokenable\Grants;
 
+use Illuminate\Http\Request;
+use Jundayw\Tokenable\Concerns\Grant\AuthorizationCodeHelper;
 use Jundayw\Tokenable\Contracts\Grant\AuthorizationCodeGrant as AuthorizationCodeGrantContract;
 use Jundayw\Tokenable\Contracts\Token\Token;
 
 class AuthorizationCodeGrant extends Grant implements AuthorizationCodeGrantContract
 {
+    use AuthorizationCodeHelper;
+
+    /**
+     * Log the given auth code into the application.
+     *
+     * @param Request $request
+     *
+     * @return static|null
+     */
+    public function fromAuthCode(Request $request): ?static
+    {
+        if (is_null($authCode = $this->getAuthCodeFromRequest($request))) {
+            return null;
+        }
+
+        $authCode  = $this->getTokenManager()->driver(
+            $this->getTokenManager()->normalizeDriverName($request->getUser())
+        )->setAuthorizationCode($authCode);
+        $authCode  = $authCode->getAuthorizationCode();
+        $tokenable = $this->getRepository()->pull("auth_code_{$authCode}");
+
+        if (is_null($tokenable)) {
+            return null;
+        }
+
+        return $this->setTokenable($tokenable);
+    }
+
+    /**
+     * Create a new access token for the user.
+     *
+     * @param string $name
+     * @param string $platform
+     * @param array  $scopes
+     *
+     * @return Token|null
+     */
+    public function createToken(string $name, string $platform = 'default', array $scopes = []): ?Token
+    {
+        return $this->getGuard()
+            ->login($this->getTokenable())
+            ->setToken($this->getToken())
+            ->createToken($name, $platform, $scopes);
+    }
+
     /**
      * Create a new authorization code token for the current tokenable entity.
      *

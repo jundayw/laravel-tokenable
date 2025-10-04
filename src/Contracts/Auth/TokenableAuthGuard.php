@@ -32,6 +32,13 @@ interface TokenableAuthGuard extends Guard
     public function once(array $credentials = []): AuthorizationCodeGrant|null;
 
     /**
+     * Log the given auth code into the application.
+     *
+     * @return AuthorizationCodeGrant|null
+     */
+    public function fromAuthCode(): AuthorizationCodeGrant|null;
+
+    /**
      * Attempt to authenticate a user using the given credentials.
      *
      * @param array $credentials
@@ -54,18 +61,9 @@ interface TokenableAuthGuard extends Guard
      *
      * @param Authenticatable $user
      *
-     * @return AccessTokenGrant|null
+     * @return AccessTokenGrant
      */
-    public function login(Authenticatable $user): AccessTokenGrant|null;
-
-    /**
-     * Log the given auth code into the application.
-     *
-     * @param string $authCode
-     *
-     * @return AccessTokenGrant|null
-     */
-    public function fromAuthCode(string $authCode): AccessTokenGrant|null;
+    public function login(Authenticatable $user): AccessTokenGrant;
 
     /**
      * Log the user out of the application.

@@ -243,6 +243,35 @@ class Tokenable
     }
 
     /**
+     * Callback used to extract the auth code from a cookie.
+     *
+     * @var callable|null
+     */
+    protected static $authCodeViaCookieCallback = null;
+
+    /**
+     * Register a callback to retrieve the auth code from a cookie.
+     *
+     * @param callable|null $callback
+     *
+     * @return void
+     */
+    public static function useAuthCodeViaCookieCallback(callable $callback = null): void
+    {
+        self::$authCodeViaCookieCallback = $callback;
+    }
+
+    /**
+     * Get the currently registered callback for retrieving the auth code from a cookie.
+     *
+     * @return callable|null
+     */
+    public static function authCodeViaCookieCallback(): ?callable
+    {
+        return self::$authCodeViaCookieCallback;
+    }
+
+    /**
      * Callback used to customize token array serialization.
      *
      * @var callable|null
