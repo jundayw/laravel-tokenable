@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Jundayw\Tokenable\Concerns\Grant\AccessTokenHelper;
 use Jundayw\Tokenable\Contracts\Grant\AccessTokenGrant as AccessTokenGrantContract;
 use Jundayw\Tokenable\Contracts\Token\Token;
+use Jundayw\Tokenable\Contracts\Tokenable;
 use Jundayw\Tokenable\Contracts\Tokenable as TokenableContract;
 use Jundayw\Tokenable\Events\AccessTokenCreated;
 use Jundayw\Tokenable\Events\AccessTokenRefreshed;
@@ -68,6 +69,14 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
             return null;
         }
 
+        // Create a new authorization code token for the current tokenable entity.
+        if ($this->isSuspendToken($tokenable, $platform)) {
+            return $this->getGuard()
+                ->onceUsingId($this->getTokenable()->getKey())
+                ->setToken($this->getToken())
+                ->createAuthCode();
+        }
+
         $accessExpireAt     = config('tokenable.ttl', 7200);
         $refreshAvailableAt = config('tokenable.refresh_nbf', 3600);
         $refreshExpireAt    = config('tokenable.refresh_ttl', 'P15D');
@@ -92,6 +101,40 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
                 event(new AccessTokenCreated($this->getGuard()->getConfig(), $authentication, $tokenable, $token));
             }
         });
+    }
+
+    /**
+     * Determine if the given tokenable entity or its platform-specific token
+     * is currently suspended.
+     *
+     * This method checks the blacklist repository using progressively less
+     * specific keys (e.g., `User:123:api`, `User:123`) to determine if a
+     * suspension flag exists for the tokenable or its platform.
+     *
+     * @param Tokenable $tokenable The tokenable model instance to check.
+     * @param string    $platform  The platform or context to check (defaults to 'default').
+     *
+     * @return bool True if the token or tokenable is suspended, false otherwise.
+     */
+    protected function isSuspendToken(Tokenable $tokenable, string $platform = 'default'): bool
+    {
+        if (!config('tokenable.suspend_enabled', true)) {
+            return false;
+        }
+
+        $target = [get_class($tokenable), $tokenable->getKey(), $platform];
+
+        for ($i = count($target); $i > 1; $i--) {
+            $key = implode(':', array_slice($target, 0, $i));
+            try {
+                if ($this->blacklist->has($key)) {
+                    return true;
+                }
+            } catch (\Throwable $e) {
+            }
+        }
+
+        return false;
     }
 
     /**

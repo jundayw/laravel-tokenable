@@ -5,6 +5,7 @@ namespace Jundayw\Tokenable;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Str;
 use Jundayw\Tokenable\Contracts\Auth\Authenticable;
+use Jundayw\Tokenable\Events\SuspendToken;
 
 trait HasTokenable
 {
@@ -49,6 +50,37 @@ trait HasTokenable
     public function tokenCan(string $scope): bool
     {
         return $this->token()?->can($scope) ?? false;
+    }
+
+    /**
+     * Suspends token usage.
+     *
+     * When invoked, this method prevents access using tokens, either at the account level
+     * or for the current platform-specific token, depending on the `$global` flag.
+     *
+     * After calling this method, subsequent calls to `createToken` may return
+     * an authorization code (`auth code`) instead of a directly usable access/refresh token.
+     * To regain access, the client must exchange the returned `auth code` for new valid tokens.
+     *
+     * @param bool $global Determines the suspension scope:
+     *                     - true: suspend at the account level, affecting all issued tokens.
+     *                     - false: suspend only the current token for its platform type.
+     *
+     * @return bool Returns true if the suspension was successfully applied, false otherwise.
+     */
+    public function suspendToken(bool $global = false): bool
+    {
+        if (!config('tokenable.suspend_enabled', true)) {
+            return false;
+        }
+
+        if (is_null($this->token())) {
+            return false;
+        }
+
+        event(new SuspendToken($global, $this->token(), $this));
+
+        return true;
     }
 
     /**

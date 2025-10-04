@@ -72,6 +72,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Token Suspension Enabled
+    |--------------------------------------------------------------------------
+    |
+    | This option determines whether the token suspension feature is enabled.
+    | When set to false disable token suspension.
+    |
+    */
+
+    'suspend_enabled' => env('TOKEN_SUSPEND_ENABLED', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Access Token Lifetime (TTL)
     |--------------------------------------------------------------------------
     |

@@ -21,6 +21,7 @@ use Jundayw\Tokenable\Events\AccessTokenCreated;
 use Jundayw\Tokenable\Events\AccessTokenRefreshed;
 use Jundayw\Tokenable\Events\AccessTokenRefreshing;
 use Jundayw\Tokenable\Events\AccessTokenRevoked;
+use Jundayw\Tokenable\Events\SuspendToken;
 use Jundayw\Tokenable\Grants\AccessTokenGrant;
 use Jundayw\Tokenable\Grants\AuthorizationCodeGrant;
 use Jundayw\Tokenable\Guards\TokenableGuard;
@@ -263,5 +264,6 @@ class TokenableServiceProvider extends ServiceProvider
         Event::listen(AccessTokenRefreshing::class, Listeners\RemoveTokenFromWhitelist::class);
         Event::listen(AccessTokenRefreshing::class, Listeners\AddTokenToBlacklist::class);
         Event::listen(AccessTokenRefreshed::class, Listeners\AddTokenToWhitelist::class);
+        Event::listen(SuspendToken::class, Listeners\SuspendTokenListener::class);
     }
 }

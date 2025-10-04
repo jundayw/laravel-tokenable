@@ -33,6 +33,24 @@ interface Tokenable
     public function tokenCan(string $scope): bool;
 
     /**
+     * Suspends token usage.
+     *
+     * When invoked, this method prevents access using tokens, either at the account level
+     * or for the current platform-specific token, depending on the `$global` flag.
+     *
+     * After calling this method, subsequent calls to `createToken` may return
+     * an authorization code (`auth code`) instead of a directly usable access/refresh token.
+     * To regain access, the client must exchange the returned `auth code` for new valid tokens.
+     *
+     * @param bool $global Determines the suspension scope:
+     *                     - true: suspend at the account level, affecting all issued tokens.
+     *                     - false: suspend only the current token for its platform type.
+     *
+     * @return bool Returns true if the suspension was successfully applied, false otherwise.
+     */
+    public function suspendToken(bool $global = false): bool;
+
+    /**
      * Get the access tokens that belong to model.
      *
      * @return MorphMany
