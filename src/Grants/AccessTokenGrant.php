@@ -157,11 +157,17 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
      */
     public function revokeToken(Request $request): bool
     {
-        if (is_null($this->findToken($request))) {
+        if (is_null($token = $this->getAccessTokenFromRequest($request))) {
             return false;
         }
 
-        if (!$this->getAuthentication()->exists) {
+        $token = $this->getTokenManager()->driver(
+            $this->getTokenManager()->normalizeDriverName($request->getUser())
+        )->setAccessToken($token);
+
+        $authentication = $this->getAuthentication()->findAccessToken($token->getAccessToken());
+
+        if (is_null($authentication)) {
             return false;
         }
 
