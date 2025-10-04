@@ -74,7 +74,7 @@ class TokenableGuard implements TokenableAuthGuard
      */
     public function revokeToken(): bool
     {
-        return $this->getAccessTokenGrant()->revokeToken($this->request);
+        return tap($this->getAccessTokenGrant()->revokeToken($this->request), fn() => $this->forgetUser());
     }
 
     /**
