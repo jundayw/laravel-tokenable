@@ -59,6 +59,15 @@ interface TokenableAuthGuard extends Guard
     public function login(Authenticatable $user): AccessTokenGrant|null;
 
     /**
+     * Log the given auth code into the application.
+     *
+     * @param string $authCode
+     *
+     * @return AccessTokenGrant|null
+     */
+    public function fromAuthCode(string $authCode): AccessTokenGrant|null;
+
+    /**
      * Log the user out of the application.
      *
      * @return bool

@@ -87,6 +87,28 @@ trait TokenableAuthHelpers
     }
 
     /**
+     * Log the given auth code into the application.
+     *
+     * @param string $authCode
+     *
+     * @return AccessTokenGrant|null
+     */
+    public function fromAuthCode(string $authCode): AccessTokenGrant|null
+    {
+        $authCode  = $this->getAccessTokenGrant()->getTokenManager()->driver(
+            $this->getAccessTokenGrant()->getTokenManager()->normalizeDriverName($this->request->getUser())
+        )->setAuthorizationCode($authCode);
+        $authCode  = $authCode->getAuthorizationCode();
+        $tokenable = $this->getAccessTokenGrant()->getRepository()->pull("auth_code_{$authCode}");
+
+        if (is_null($tokenable)) {
+            return null;
+        }
+
+        return $this->getAccessTokenGrant()->setTokenable($tokenable);
+    }
+
+    /**
      * Log the user out of the application.
      *
      * @return bool
