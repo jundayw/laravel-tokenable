@@ -16,7 +16,15 @@ module.exports = [
     {
         title: '基础',
         collapsable: false,
-        children: []
+        children: [
+            '/usage/introduction',
+            '/usage/quick-start',
+            '/usage/create-token',
+            '/usage/refresh-token',
+            '/usage/revoke-token',
+            '/usage/auth-code',
+            '/usage/suspend-token',
+        ]
     },
     {
         title: '指南',
@@ -26,6 +34,9 @@ module.exports = [
     {
         title: '最佳实践',
         collapsable: false,
-        children: []
+        children: [
+            '/features/example',
+            '/features/cookie',
+        ]
     }
 ]

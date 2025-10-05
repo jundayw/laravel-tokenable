@@ -29,7 +29,6 @@ lang: zh-CN
     | 用于存储和管理已颁发令牌。默认情况下，如果环境文件中未定义特定的
     | TOKEN_CONNECTION，则回退到应用程序的主数据库连接。
     |
-    |
     */
     
     'connection' => env('TOKEN_CONNECTION', env('DB_CONNECTION', 'mysql')),
@@ -43,7 +42,6 @@ lang: zh-CN
     | 包括访问令牌、刷新令牌、到期时间和
     | 撤销状态。如果您希望
     | 将令牌存储在自定义表中，可以更改此表名称。
-    |
     |
     */
     
@@ -60,7 +58,7 @@ lang: zh-CN
 php artisan vendor:publish --tag=tokenable-migrations
 ```
 
-## 整合迁移
+## 执行迁移
 
 ```shell
 php artisan migrate --path=database/migrations/2025_06_01_000000_create_auth_token_table.php

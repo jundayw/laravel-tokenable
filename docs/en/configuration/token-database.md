@@ -31,7 +31,6 @@ lang: en-US
     | the application's main database connection if no specific
     | TOKEN_CONNECTION is defined in the environment file.
     |
-    |
     */
 
     'connection' => env('TOKEN_CONNECTION', env('DB_CONNECTION', 'mysql')),
@@ -45,7 +44,6 @@ lang: en-US
     | including access tokens, refresh tokens, expiration times, and
     | revocation status. You can change this table name if you want
     | to store tokens in a custom table.
-    |
     |
     */
 

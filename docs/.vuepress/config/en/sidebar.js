@@ -16,7 +16,14 @@ module.exports = [
     {
         title: 'Quick Start',
         collapsable: false,
-        children: []
+        children: [
+            '/en/usage/quick-start',
+            '/en/usage/create-token',
+            '/en/usage/refresh-token',
+            '/en/usage/revoke-token',
+            '/en/usage/auth-code',
+            '/en/usage/suspend-token',
+        ]
     },
     {
         title: 'Guide',
@@ -26,6 +33,9 @@ module.exports = [
     {
         title: 'Features',
         collapsable: false,
-        children: []
+        children: [
+            '/en/features/example',
+            '/en/features/cookie',
+        ]
     }
 ]
