@@ -3,19 +3,17 @@
 namespace Jundayw\Tokenable\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Jundayw\Tokenable\Contracts\Grant\AccessTokenGrant;
-use Jundayw\Tokenable\Contracts\Grant\AuthorizationCodeGrant;
 use Jundayw\Tokenable\Contracts\Grant\Factory;
-use Jundayw\Tokenable\Contracts\Grant\RefreshTokenGrant;
-use Jundayw\Tokenable\Contracts\Grant\RevokeTokenGrant;
+use Jundayw\Tokenable\Grants\AccessTokenGrant;
+use Jundayw\Tokenable\Grants\AuthorizationCodeGrant;
 
 /**
  * @method static AccessTokenGrant getAccessTokenGrant()
  * @method static AuthorizationCodeGrant getAuthorizationCodeGrant()
- * @method static RefreshTokenGrant getRefreshTokenGrant()
- * @method static RevokeTokenGrant getRevokeTokenGrant()
  *
  * @see GrantManager
+ * @see AccessTokenGrant
+ * @see AuthorizationCodeGrant
  */
 class Token extends Facade
 {
