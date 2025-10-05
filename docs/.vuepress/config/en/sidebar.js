@@ -28,7 +28,9 @@ module.exports = [
     {
         title: 'Guide',
         collapsable: false,
-        children: []
+        children: [
+            '/en/guide/header',
+        ]
     },
     {
         title: 'Features',

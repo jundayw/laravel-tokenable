@@ -29,7 +29,9 @@ module.exports = [
     {
         title: '指南',
         collapsable: false,
-        children: []
+        children: [
+            'guide/header',
+        ]
     },
     {
         title: '最佳实践',
