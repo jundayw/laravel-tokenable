@@ -86,7 +86,7 @@ You may wish to publish only the migration files:
 php artisan vendor:publish --tag=tokenable-migrations
 ```
 
-### Generating Migrations
+### Run Migrations
 
 ```shell
 php artisan migrate --path=database/migrations/2025_06_01_000000_create_auth_token_table.php
@@ -97,6 +97,64 @@ php artisan migrate --path=database/migrations/2025_06_01_000000_create_auth_tok
 <!-- USAGE EXAMPLES -->
 
 ## Usage
+
+### Configuration
+
+Use the `tokenable` guard in the `guards` configuration of your application's `auth.php` configuration file:
+
+```php
+'guards' => [
+    'api' => [
+        'driver' => 'tokenable',
+        'provider' => 'users',
+    ],
+],
+```
+
+### Model
+
+To start issuing tokens for users, your User model should use the `Jundayw\Tokenable\HasTokenable` trait and implement the `Jundayw\Tokenable\Contracts\Tokenable` interface.
+
+```php
+namespace App\Models;
+
+use Jundayw\Tokenable\Contracts\Tokenable;
+use Jundayw\Tokenable\HasTokenable;
+
+class User extends Authenticatable implements Tokenable
+{
+    use HasTokenable, HasFactory, Notifiable;
+}
+```
+
+### Create Token
+
+```php
+$user = User::query()->where([
+    'email'    => $request->get('email'),
+    'password' => Hash::make($request->get('password')),
+])->first();
+
+if(is_null($user)){
+    return null;
+}
+
+return $this->guard('web')
+    ->login($user)
+    ->createToken(name: 'PC Token', platform: 'pc');
+```
+
+### Refresh Token
+
+```php
+return $this->guard('web')->refreshToken();
+```
+
+### Revoke Token
+
+```php
+return $this->guard()->revokeToken();
+```
 
 <!-- CONTRIBUTING -->
 
