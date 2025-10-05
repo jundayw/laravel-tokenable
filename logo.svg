@@ -1,0 +1,41 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF2D20"/>
+      <stop offset="100%" stop-color="#5A3C85"/>
+    </linearGradient>
+    <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F0F0F0"/>
+    </linearGradient>
+    <linearGradient id="keyholeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F9A826"/>
+      <stop offset="100%" stop-color="#FF6B6B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="240" fill="url(#bgGradient)"/>
+  
+  <!-- Outer Ring -->
+  <circle cx="512" cy="512" r="380" fill="none" stroke="url(#ringGradient)" stroke-width="24" opacity="0.8"/>
+  
+  <!-- Inner Ring -->
+  <circle cx="512" cy="512" r="300" fill="none" stroke="url(#ringGradient)" stroke-width="20" opacity="0.6"/>
+  
+  <!-- Keyhole Base -->
+  <circle cx="512" cy="512" r="120" fill="url(#keyholeGradient)" opacity="0.9"/>
+  
+  <!-- Keyhole Slot -->
+  <rect x="492" y="400" width="40" height="160" rx="20" fill="#FFFFFF" opacity="0.8"/>
+  
+  <!-- Connection Lines -->
+  <path d="M512 300 L512 200 M512 724 L512 824" stroke="#F9A826" stroke-width="16" stroke-linecap="round" opacity="0.7"/>
+  <path d="M300 512 L200 512 M724 512 L824 512" stroke="#F9A826" stroke-width="16" stroke-linecap="round" opacity="0.7"/>
+  
+  <!-- Security Dots -->
+  <circle cx="512" cy="350" r="12" fill="#F59E0B" opacity="0.9"/>
+  <circle cx="512" cy="674" r="12" fill="#F59E0B" opacity="0.9"/>
+  <circle cx="350" cy="512" r="12" fill="#F59E0B" opacity="0.9"/>
+  <circle cx="674" cy="512" r="12" fill="#F59E0B" opacity="0.9"/>
+</svg>
