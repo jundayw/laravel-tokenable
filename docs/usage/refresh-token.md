@@ -5,7 +5,7 @@ lang: zh-CN
 
 # 刷新令牌
 
-![刷新令牌流程](/assets/zh/refresh.svg)
+![刷新令牌流程](./assets/zh/refresh.svg)
 
 ## 路由
 

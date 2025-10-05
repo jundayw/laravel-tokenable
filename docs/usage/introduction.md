@@ -34,7 +34,7 @@ lang: zh-CN
 
 ## 认证流程
 
-![认证流程](/assets/zh/auth.svg)
+![认证流程](./assets/zh/auth.svg)
 
 - 用户操作：用户在前端输入账号和密码，点击登录；
 - 前端处理：前端把用户输入的凭据发送到后端的登录接口；
@@ -50,7 +50,7 @@ lang: zh-CN
 
 ## 刷新令牌流程
 
-![刷新令牌流程](/assets/zh/refresh.svg)
+![刷新令牌流程](./assets/zh/refresh.svg)
 
 - 前端拦截：前端通过配置HTTP响应拦截器来捕获所有的响应。当拦截器捕获到后端返回的 *401 Unauthorized* 错误，并且确认是 `Access Token` 过期导致的，将当前失败的请求放入失败队列；
 - 检查刷新令牌：拦截器会检查本地是否存储了 `Refresh Token`。如果有，就向后端特定的刷新接口 `/api/auth/refresh` 发送请求，并在请求头里带上 `Authorization: Bearer <Refresh Token>`；

@@ -5,7 +5,7 @@ lang: zh-CN
 
 # 颁发令牌
 
-![认证流程](/assets/zh/auth.svg)
+![认证流程](./assets/zh/auth.svg)
 
 ## 配置
 

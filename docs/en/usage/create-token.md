@@ -5,7 +5,7 @@ lang: en-US
 
 # Create Token
 
-![Create Token](/assets/en/auth.svg)
+![Create Token](./assets/en/auth.svg)
 
 ## Configuration
 

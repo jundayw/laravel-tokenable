@@ -5,7 +5,7 @@ lang: en-US
 
 # Refresh Token
 
-![Refresh Token](/assets/en/refresh.svg)
+![Refresh Token](./assets/en/refresh.svg)
 
 ## Route
 
