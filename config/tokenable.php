@@ -51,7 +51,6 @@ return [
         | When false, issuing a new token will invalidate all existing tokens
         | regardless of platform.
         |
-        |
         */
 
         'allow_multi_platforms' => true,
@@ -311,7 +310,6 @@ return [
         | the application's main database connection if no specific
         | TOKEN_CONNECTION is defined in the environment file.
         |
-        |
         */
 
         'connection' => env('TOKEN_CONNECTION', env('DB_CONNECTION', 'mysql')),
@@ -325,7 +323,6 @@ return [
         | including access tokens, refresh tokens, expiration times, and
         | revocation status. You can change this table name if you want
         | to store tokens in a custom table.
-        |
         |
         */
 
