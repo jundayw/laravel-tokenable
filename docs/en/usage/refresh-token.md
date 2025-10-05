@@ -5,7 +5,7 @@ lang: en-US
 
 # Refresh Token
 
-![Refresh Token](./assets/en/refresh.svg)
+<img :src="$withBase('/assets/en/refresh.svg')" alt="Refresh Token">
 
 ## Route
 

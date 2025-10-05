@@ -5,7 +5,7 @@ lang: zh-CN
 
 # 颁发令牌
 
-![认证流程](./assets/zh/auth.svg)
+<img :src="$withBase('/assets/zh/auth.svg')" alt="Create Token">
 
 ## 配置
 

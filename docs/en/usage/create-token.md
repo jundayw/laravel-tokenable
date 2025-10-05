@@ -5,7 +5,7 @@ lang: en-US
 
 # Create Token
 
-![Create Token](./assets/en/auth.svg)
+<img :src="$withBase('/assets/en/auth.svg')" alt="Create Token">
 
 ## Configuration
 

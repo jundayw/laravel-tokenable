@@ -5,7 +5,7 @@ lang: zh-CN
 
 # 刷新令牌
 
-![刷新令牌流程](./assets/zh/refresh.svg)
+<img :src="$withBase('/assets/zh/refresh.svg')" alt="Refresh Token">
 
 ## 路由
 
