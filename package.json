@@ -27,6 +27,7 @@
         "vuepress": "^1.9.10"
     },
     "devDependencies": {
+        "@vuepress/plugin-back-to-top": "^1.9.10",
         "gh-pages": "^6.3.0"
     }
 }

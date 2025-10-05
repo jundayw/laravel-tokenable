@@ -1,31 +1,31 @@
 module.exports = [
     {
-        title: '开始',
+        title: 'Configuration',
         collapsable: false,
         children: [
-            '/start/use', '/start/faq'
+            '/en/configuration/token',
+            '/en/configuration/token-management',
+            '/en/configuration/token-suspension',
+            '/en/configuration/token-ttl',
+            '/en/configuration/token-driver',
+            '/en/configuration/token-database',
+            '/en/configuration/token-queue',
+            '/en/configuration/token-cache',
         ]
     },
     {
-        title: '开发',
+        title: 'Quick Start',
         collapsable: false,
-        children: [
-            '/develop/layout', '/develop/router', '/develop/page', '/develop/theme', '/develop/service', '/develop/mock'
-        ]
+        children: []
     },
     {
-        title: '进阶',
+        title: 'Guide',
         collapsable: false,
-        children: [
-            '/advance/i18n', '/advance/async', '/advance/authority', '/advance/login', '/advance/guard', '/advance/interceptors',
-            '/advance/api'
-        ]
+        children: []
     },
     {
-        title: '其它',
+        title: 'Features',
         collapsable: false,
-        children: [
-            '/other/upgrade', '/other/community'
-        ]
+        children: []
     }
 ]

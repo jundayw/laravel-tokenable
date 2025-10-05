@@ -18,7 +18,10 @@ module.exports = {
         }
     },
     themeConfig: themeConfig,
-    plugins: ['@vuepress/back-to-top'],
+    plugins: ['@vuepress/back-to-top', '@vuepress/search', {
+        search: true,
+        searchMaxSuggestions: 10
+    }],
     markdown: {
         lineNumbers: true
     }

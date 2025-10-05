@@ -12,6 +12,9 @@ importers:
         specifier: ^1.9.10
         version: 1.9.10(@vue/compiler-sfc@3.5.21)(hogan.js@3.0.2)(lodash@4.17.21)
     devDependencies:
+      '@vuepress/plugin-back-to-top':
+        specifier: ^1.9.10
+        version: 1.9.10
       gh-pages:
         specifier: ^6.3.0
         version: 6.3.0
@@ -797,6 +800,9 @@ packages:
 
   '@vuepress/plugin-active-header-links@1.9.10':
     resolution: {integrity: sha512-2dRr3DE2UBFXhyMtLR3sGTdRyDM8YStuY6AOoQmoSgwy1IHt7PO7ypOuf1akF+1Nv8Q2aISU06q6TExZouu3Mw==}
+
+  '@vuepress/plugin-back-to-top@1.9.10':
+    resolution: {integrity: sha512-iInIp66wu717CAnT2pyd9Bs/vAgrUBOBIQ7WMnfJo07cW/ZIothpyrSHnpCRSsfJ/jLivMPqW0pviqppt64BzQ==}
 
   '@vuepress/plugin-last-updated@1.9.10':
     resolution: {integrity: sha512-YxzWGF/OfU6WsHSynZFn74NGGp7dY27Bjy9JyyFo8wF5+2V1gpyDjveHKHGKugS/pMXlxfjzhv9E2Wmy9R7Iog==}
@@ -6182,6 +6188,13 @@ snapshots:
       - supports-color
 
   '@vuepress/plugin-active-header-links@1.9.10':
+    dependencies:
+      '@vuepress/types': 1.9.10
+      lodash.debounce: 4.0.8
+    transitivePeerDependencies:
+      - debug
+
+  '@vuepress/plugin-back-to-top@1.9.10':
     dependencies:
       '@vuepress/types': 1.9.10
       lodash.debounce: 4.0.8

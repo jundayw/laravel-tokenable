@@ -1,5 +1,5 @@
 ---
-title: Examples
+title: Guide
 lang: en-US
 ---
-# Examples
+# Guide
