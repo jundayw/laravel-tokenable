@@ -55,7 +55,7 @@ class SuspendTokenListener extends ShouldQueueable
             $keys[] = $event->getAuthorization()->getAttribute('platform');
         }
 
-        $this->blacklist->forever(implode(':', $keys), 1);
+        $this->blacklist->forever(implode(':', $keys), now()->toIso8601ZuluString());
     }
 
     /**
