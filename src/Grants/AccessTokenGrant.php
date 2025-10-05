@@ -12,6 +12,7 @@ use Jundayw\Tokenable\Events\AccessTokenCreated;
 use Jundayw\Tokenable\Events\AccessTokenRefreshed;
 use Jundayw\Tokenable\Events\AccessTokenRefreshing;
 use Jundayw\Tokenable\Events\AccessTokenRevoked;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class AccessTokenGrant extends Grant implements AccessTokenGrantContract
 {
@@ -41,7 +42,23 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
             $this->getTokenManager()->normalizeDriverName($request->getUser())
         )->setAccessToken($token);
 
-        $authentication = $this->getAuthentication()->findAccessToken($token->getAccessToken());
+        try {
+            if ($this->blacklist->isBlacklistEnabled() && $this->blacklist->has($token->getAccessToken())) {
+                return null;
+            }
+        } catch (InvalidArgumentException $e) {
+            return null;
+        }
+
+        try {
+            if ($this->whitelist->isWhitelistEnabled() && $authentication = $this->whitelist->get($token->getAccessToken())) {
+                $authentication->setRelation('tokenable', $authentication->getAttribute('tokenable'));
+            } else {
+                $authentication = $this->getAuthentication()->findAccessToken($token->getAccessToken());
+            }
+        } catch (InvalidArgumentException $e) {
+            $authentication = $this->getAuthentication()->findAccessToken($token->getAccessToken());
+        }
 
         if (is_null($authentication) ||
             !$this->isValidAuthenticationToken($authentication, $tokenable = $authentication->getRelation('tokenable')) ||
@@ -155,6 +172,14 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
         $token = $this->tokenManager->driver(
             $this->tokenManager->normalizeDriverName($request->getUser())
         )->setRefreshToken($token);
+
+        try {
+            if ($this->blacklist->isBlacklistEnabled() && $this->blacklist->has($token->getRefreshToken())) {
+                return null;
+            }
+        } catch (InvalidArgumentException $e) {
+            return null;
+        }
 
         $authentication = $this->authentication->findRefreshToken($token->getRefreshToken());
 
