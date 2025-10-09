@@ -238,12 +238,12 @@ class TokenableServiceProvider extends ServiceProvider
      */
     protected function makeGuard(AuthFactoryContract $auth, string $name, array $config): Guard
     {
-        $tokenManagement = config('tokenable.token_management');
-        $tokenManagement = array_filter($tokenManagement, static fn($key) => !array_key_exists($key, $config), ARRAY_FILTER_USE_KEY);
+        $multiToken = config('tokenable.multi_token');
+        $multiToken = array_filter($multiToken, static fn($key) => !array_key_exists($key, $config), ARRAY_FILTER_USE_KEY);
 
         return new TokenableGuard(
             $name,
-            new Repository($config + $tokenManagement),
+            new Repository($config + $multiToken),
             $this->app[GrantFactoryContract::class],
             $this->app['request'],
             $auth->createUserProvider($config['provider'] ?? null)

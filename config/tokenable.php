@@ -18,24 +18,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Token Management
+    | Multi-Token Support
     |--------------------------------------------------------------------------
     |
-    | Manage how user authentication tokens are handled across different
-    | platform types. These options define whether users can maintain
-    | concurrent tokens and how multiple tokens per platform type are treated.
+    | When enabled, a user can hold multiple active tokens simultaneously,
+    | for example, one per platform (web, app, API, etc.).
     |
     */
 
-    'token_management' => [
+    'multi_token' => [
 
         /*
         |--------------------------------------------------------------------------
-        | Enabled
+        | Multi-Tokens Enabled
         |--------------------------------------------------------------------------
         |
-        | Determines whether token concurrency control is active.
-        | When true, rules that enforce token concurrency limits are applied.
+        | This option determines whether multiple active tokens can be issued
+        | for a single user. When enabled, a user may hold distinct tokens
+        | across different platforms (such as Web, App, or API clients),
+        | allowing simultaneous sessions under the same account.
         |
         */
 
