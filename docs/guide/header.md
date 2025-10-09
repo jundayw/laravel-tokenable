@@ -7,6 +7,10 @@ lang: zh-CN
 
 ## 默认响应结构体
 
+::: warning
+Authorization: Bearer <access_token>
+:::
+
 令牌结构体：
 
 ```json
@@ -29,21 +33,11 @@ lang: zh-CN
 }
 ```
 
-::: warning
-访问令牌:
-
-Authorization: Bearer <access_token>
-
-刷新令牌:
-
-Authorization: Bearer <refresh_token>
-
-授权码:
-
-Authorization: Bearer <authorization_code>
-:::
-
 ## 指定响应结构体
+
+::: warning
+Authorization: Basic <base64(hash:access_token)>
+:::
 
 使用 `withToken` 方法指定响应结构体类型：
 
@@ -84,17 +78,3 @@ return $this->guard('web')
     "type": "code"
 }
 ```
-
-::: warning
-访问令牌:
-
-Authorization: Basic <base64(hash:access_token)>
-
-刷新令牌:
-
-Authorization: Basic <base64(hash:refresh_token)>
-
-授权码:
-
-Authorization: Basic <base64(hash:authorization_code)>
-:::

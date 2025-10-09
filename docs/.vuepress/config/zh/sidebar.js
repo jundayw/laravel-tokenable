@@ -31,6 +31,7 @@ module.exports = [
         collapsable: false,
         children: [
             'guide/header',
+            'guide/extend-driver',
         ]
     },
     {

@@ -1,31 +1,32 @@
 ---
-title: Token Management
+title: Multi-Token Support
 lang: en-US
 ---
 
-# Token Management
+# Multi-Token Support
 
 ```php
 /*
 |--------------------------------------------------------------------------
-| Token Management
+| Multi-Token Support
 |--------------------------------------------------------------------------
 |
-| Manage how user authentication tokens are handled across different
-| platform types. These options define whether users can maintain
-| concurrent tokens and how multiple tokens per platform type are treated.
+| When enabled, a user can hold multiple active tokens simultaneously,
+| for example, one per platform (web, app, API, etc.).
 |
 */
 
-'token_management' => [
+'multi_token' => [
 
     /*
     |--------------------------------------------------------------------------
-    | Enabled
+    | Multi-Tokens Enabled
     |--------------------------------------------------------------------------
     |
-    | Determines whether token concurrency control is active.
-    | When true, rules that enforce token concurrency limits are applied.
+    | This option determines whether multiple active tokens can be issued
+    | for a single user. When enabled, a user may hold distinct tokens
+    | across different platforms (such as Web, App, or API clients),
+    | allowing simultaneous sessions under the same account.
     |
     */
 
@@ -75,7 +76,7 @@ Example: ['pc'] allows multiple tokens for PC platforms at the same time.
 
 ## Priority
 
-The `guards` configuration in `config/auth.php` takes precedence over the `token_management` configuration in `config/tokenable.php`,
+The `guards` configuration in `config/auth.php` takes precedence over the `multi_token` configuration in `config/tokenable.php`,
 so the configuration in `config/auth.php` can be overwritten in `config/tokenable.php`.
 
 ```php

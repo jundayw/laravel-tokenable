@@ -7,6 +7,10 @@ lang: en-US
 
 ## Default Response Structure
 
+::: warning
+Authorization: Bearer <access_token>
+:::
+
 Token Structure:
 
 ```json
@@ -29,21 +33,11 @@ Authorization Code Structure:
 }
 ```
 
-::: warning
-Access Token:
-
-Authorization: Bearer <access_token>
-
-Refresh Token:
-
-Authorization: Bearer <refresh_token>
-
-Authorization Code:
-
-Authorization: Bearer <authorization_code>
-:::
-
 ## Specify Response Structure
+
+::: warning
+Authorization: Basic <base64(hash:access_token)>
+:::
 
 Use `withToken` method to specify the response structure type:
 
@@ -84,17 +78,3 @@ Authorization Code Structure:
     "type": "code"
 }
 ```
-
-::: warning
-Access Token:
-
-Authorization: Basic <base64(hash:access_token)>
-
-Refresh Token:
-
-Authorization: Basic <base64(hash:refresh_token)>
-
-Authorization Code:
-
-Authorization: Basic <base64(hash:authorization_code)>
-:::

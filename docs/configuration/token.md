@@ -24,7 +24,7 @@ lang: zh-CN
 此选项控制 `TokenManager` 使用的默认令牌驱动程序。
 
 ::: tip
-您可以选择 `hash` 或 `jwt` [令牌驱动](token-driver.md)，也可以注册您自己的驱动程序。
+您可以选择 `hash` 或 `jwt` [令牌驱动](token-driver.md)，也可以[注册您自己的驱动程序](../guide/extend-driver)。
 :::
 
 ```php

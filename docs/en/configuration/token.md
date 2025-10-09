@@ -24,7 +24,7 @@ lang: en-US
 This option controls the default token driver used by the `TokenManager`.
 
 ::: tip
-You may choose between "hash" or "jwt" or register your own driver.
+You may choose between "hash" or "jwt" or [Custom Token Driver](../guide/extend-driver).
 :::
 
 ```php
