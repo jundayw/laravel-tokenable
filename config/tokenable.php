@@ -399,7 +399,7 @@ return [
         |
         */
 
-        'driver' => env('TOKEN_CACHE_DRIVER', env('CACHE_DRIVER', 'file')),
+        'driver' => env('TOKEN_CACHE_DRIVER', env('CACHE_STORE', env('CACHE_DRIVER', 'file'))),
 
         /*
         |--------------------------------------------------------------------------
