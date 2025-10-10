@@ -5,7 +5,7 @@ namespace Jundayw\Tokenable;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Str;
 use Jundayw\Tokenable\Contracts\Auth\Authenticable;
-use Jundayw\Tokenable\Events\SuspendToken;
+use Jundayw\Tokenable\Events\SuspendTokenCreated;
 
 trait HasTokenable
 {
@@ -78,7 +78,7 @@ trait HasTokenable
             return false;
         }
 
-        event(new SuspendToken($global, $this->token(), $this));
+        event(new SuspendTokenCreated($global, $this->token()));
 
         return true;
     }

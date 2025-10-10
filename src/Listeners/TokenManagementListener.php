@@ -23,6 +23,10 @@ class TokenManagementListener extends ShouldQueueable
             ->getAuthorization()
             ->newQuery()
             ->with('tokenable')
+            ->where([
+                'tokenable_type' => $event->getAuthorization()->getAttribute('tokenable_type'),
+                'tokenable_id'   => $event->getAuthorization()->getAttribute('tokenable_id'),
+            ])
             ->when(static function (Builder $builder) use ($event) {
                 return $event->getConfig('allow_multi_platforms') ? $builder->getModel()
                     ->newQuery()
@@ -38,7 +42,7 @@ class TokenManagementListener extends ShouldQueueable
             })
             ->chunkById(10, static fn(Collection $collection) => $collection->each(function (Authenticable $authorization) use ($event) {
                 if ($authorization->delete()) {
-                    event(new AccessTokenRevoked($authorization, $authorization->getRelation('tokenable'), $event->getToken()));
+                    event(new AccessTokenRevoked($authorization->getAttributes()));
                 }
             }));
     }

@@ -4,10 +4,8 @@ namespace Jundayw\Tokenable\Events;
 
 use Illuminate\Queue\SerializesModels;
 use Jundayw\Tokenable\Contracts\Auth\Authenticable;
-use Jundayw\Tokenable\Contracts\Token\Token;
-use Jundayw\Tokenable\Contracts\Tokenable;
 
-class AccessTokenEvent
+abstract class AccessTokenEvent
 {
     use SerializesModels;
 
@@ -15,13 +13,9 @@ class AccessTokenEvent
      * Create a new event instance.
      *
      * @param Authenticable $authorization
-     * @param Tokenable     $tokenable
-     * @param Token         $token
      */
     public function __construct(
         protected Authenticable $authorization,
-        protected Tokenable $tokenable,
-        protected Token $token,
     ) {
         //
     }
@@ -37,22 +31,14 @@ class AccessTokenEvent
     }
 
     /**
-     * Get the tokenable entity instance.
+     * Get an attribute from the model.
      *
-     * @return Tokenable
-     */
-    public function getTokenable(): Tokenable
-    {
-        return $this->tokenable;
-    }
-
-    /**
-     * Get the token entity instance.
+     * @param string $key
      *
-     * @return Token
+     * @return mixed
      */
-    public function getToken(): Token
+    public function getAttribute(string $key): mixed
     {
-        return $this->token;
+        return $this->authorization->getAttribute($key);
     }
 }

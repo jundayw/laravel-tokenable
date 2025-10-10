@@ -6,9 +6,8 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Jundayw\Tokenable\Contracts\Auth\Authenticable;
 use Jundayw\Tokenable\Contracts\Blacklist;
-use Jundayw\Tokenable\Contracts\Token\Token;
 use Jundayw\Tokenable\Events\AccessTokenRevoked;
-use Jundayw\Tokenable\Events\SuspendToken;
+use Jundayw\Tokenable\Events\SuspendTokenCreated;
 
 class SuspendTokenListener extends ShouldQueueable
 {
@@ -21,7 +20,7 @@ class SuspendTokenListener extends ShouldQueueable
     /**
      * @inheritdoc
      *
-     * @param SuspendToken $event
+     * @param SuspendTokenCreated $event
      *
      * @return void
      */
@@ -31,25 +30,22 @@ class SuspendTokenListener extends ShouldQueueable
             ->getAuthorization()
             ->newQuery()
             ->with('tokenable')
-            ->when($event->isGlobal(), function (Builder $builder) use ($event) {
+            ->where([
+                'tokenable_type' => $event->getAuthorization()->getAttribute('tokenable_type'),
+                'tokenable_id'   => $event->getAuthorization()->getAttribute('tokenable_id'),
+            ])
+            ->unless($event->isGlobal(), function (Builder $builder) use ($event) {
                 $builder->where([
-                    'tokenable_type' => $event->getAuthorization()->getAttribute('tokenable_type'),
-                    'tokenable_id'   => $event->getAuthorization()->getAttribute('tokenable_id'),
-                ]);
-            }, function (Builder $builder) use ($event) {
-                $builder->where([
-                    'tokenable_type' => $event->getAuthorization()->getAttribute('tokenable_type'),
-                    'tokenable_id'   => $event->getAuthorization()->getAttribute('tokenable_id'),
-                    'platform'       => $event->getAuthorization()->getAttribute('platform'),
+                    'platform' => $event->getAuthorization()->getAttribute('platform'),
                 ]);
             })
             ->chunkById(10, static fn(Collection $collection) => $collection->each(function (Authenticable $authorization) use ($event) {
                 if ($authorization->delete()) {
-                    event(new AccessTokenRevoked($authorization, $authorization->getRelation('tokenable'), app(Token::class)));
+                    event(new AccessTokenRevoked($authorization->getAttributes()));
                 }
             }));
 
-        $keys = [get_class($event->getTokenable()), $event->getTokenable()->getKey()];
+        $keys = [$event->getAttribute('tokenable_type'), $event->getAttribute('tokenable_id')];
 
         if (!$event->isGlobal()) {
             $keys[] = $event->getAuthorization()->getAttribute('platform');
@@ -61,7 +57,7 @@ class SuspendTokenListener extends ShouldQueueable
     /**
      * Determine whether the listener should be queued.
      *
-     * @param SuspendToken $event
+     * @param SuspendTokenCreated $event
      *
      * @return bool
      */

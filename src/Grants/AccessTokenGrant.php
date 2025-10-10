@@ -10,7 +10,6 @@ use Jundayw\Tokenable\Contracts\Tokenable;
 use Jundayw\Tokenable\Contracts\Tokenable as TokenableContract;
 use Jundayw\Tokenable\Events\AccessTokenCreated;
 use Jundayw\Tokenable\Events\AccessTokenRefreshed;
-use Jundayw\Tokenable\Events\AccessTokenRefreshing;
 use Jundayw\Tokenable\Events\AccessTokenRevoked;
 use Psr\SimpleCache\InvalidArgumentException;
 
@@ -115,7 +114,7 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
                 'access_token'  => $token->getAccessToken(),
                 'refresh_token' => $token->getRefreshToken(),
             ])->save()) {
-                event(new AccessTokenCreated($this->getGuard()->getConfig(), $authentication, $tokenable, $token));
+                event(new AccessTokenCreated($this->getGuard()->getConfig(), $authentication));
             }
         });
     }
@@ -202,16 +201,14 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
         $this->setAuthentication($authentication)->setTokenable($tokenable)->setToken($token);
 
         return tap($token, function (Token $token) use ($authentication, $tokenable) {
-            [
-                $originalAuthentication, $originalTokenable, $originalToken,
-            ] = array_map(fn($instance) => clone $instance, [$authentication, $tokenable, $token]);
+            $attributes = $authentication->getAttributes();
             if ($authentication->fill([
                 'token_driver'  => $token->getName(),
                 'access_token'  => $token->getAccessToken(),
                 'refresh_token' => $token->getRefreshToken(),
             ])->save()) {
-                event(new AccessTokenRefreshing($originalAuthentication, $originalTokenable, $originalToken));
-                event(new AccessTokenRefreshed($authentication, $tokenable, $token));
+                event(new AccessTokenRevoked($attributes));
+                event(new AccessTokenRefreshed($authentication));
             }
         });
     }
@@ -240,7 +237,7 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
         }
 
         if ($this->getAuthentication()->delete()) {
-            event(new AccessTokenRevoked($this->getAuthentication(), $this->getTokenable(), $this->getToken()));
+            event(new AccessTokenRevoked($this->getAuthentication()->getAttributes()));
             return true;
         }
 

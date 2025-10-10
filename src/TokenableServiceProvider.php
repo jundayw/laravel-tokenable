@@ -17,14 +17,10 @@ use Jundayw\Tokenable\Contracts\Grant\Grant;
 use Jundayw\Tokenable\Contracts\Token\Factory as TokenFactoryContract;
 use Jundayw\Tokenable\Contracts\Token\Token;
 use Jundayw\Tokenable\Contracts\Whitelist;
-use Jundayw\Tokenable\Events\AccessTokenCreated;
-use Jundayw\Tokenable\Events\AccessTokenRefreshed;
-use Jundayw\Tokenable\Events\AccessTokenRefreshing;
-use Jundayw\Tokenable\Events\AccessTokenRevoked;
-use Jundayw\Tokenable\Events\SuspendToken;
 use Jundayw\Tokenable\Grants\AccessTokenGrant;
 use Jundayw\Tokenable\Grants\AuthorizationCodeGrant;
 use Jundayw\Tokenable\Guards\TokenableGuard;
+use Jundayw\Tokenable\Listeners\TokenableEventSubscriber;
 use Jundayw\Tokenable\Middleware\CheckForAnyScope;
 use Jundayw\Tokenable\Middleware\CheckScopes;
 use Jundayw\Tokenable\Repositories\BlacklistRepository;
@@ -257,13 +253,6 @@ class TokenableServiceProvider extends ServiceProvider
      */
     protected function registerListeners(): void
     {
-        Event::listen(AccessTokenCreated::class, Listeners\TokenManagementListener::class);
-        Event::listen(AccessTokenCreated::class, Listeners\AddTokenToWhitelist::class);
-        Event::listen(AccessTokenRevoked::class, Listeners\RemoveTokenFromWhitelist::class);
-        Event::listen(AccessTokenRevoked::class, Listeners\AddTokenToBlacklist::class);
-        Event::listen(AccessTokenRefreshing::class, Listeners\RemoveTokenFromWhitelist::class);
-        Event::listen(AccessTokenRefreshing::class, Listeners\AddTokenToBlacklist::class);
-        Event::listen(AccessTokenRefreshed::class, Listeners\AddTokenToWhitelist::class);
-        Event::listen(SuspendToken::class, Listeners\SuspendTokenListener::class);
+        Event::subscribe(TokenableEventSubscriber::class);
     }
 }
