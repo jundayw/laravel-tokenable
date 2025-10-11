@@ -108,6 +108,27 @@ interface Token extends Arrayable, Jsonable
     public function getExpiresIn(): string;
 
     /**
+     * Checks if the given key exists in the attributes array.
+     *
+     * @param string $key The attribute key to check
+     *
+     * @return bool True if the key exists, false otherwise
+     */
+    public function has(string $key): bool;
+
+    /**
+     * Retrieves the value associated with the given key from the attributes array.
+     *
+     * If the key does not exist, the provided default value is returned.
+     *
+     * @param string $key     The attribute key to retrieve
+     * @param mixed  $default The default value to return if the key does not exist (default: null)
+     *
+     * @return mixed The value of the attribute, or the default value if not present
+     */
+    public function get(string $key, mixed $default = null): mixed;
+
+    /**
      * Build an access token and refresh token pair from given values.
      *
      * @param Authenticable $authentication
