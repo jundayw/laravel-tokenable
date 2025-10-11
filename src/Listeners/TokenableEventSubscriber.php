@@ -2,6 +2,7 @@
 
 namespace Jundayw\Tokenable\Listeners;
 
+use Illuminate\Contracts\Cache\Repository;
 use Jundayw\Tokenable\Contracts\Blacklist;
 use Jundayw\Tokenable\Contracts\Whitelist;
 use Jundayw\Tokenable\Events\AccessTokenCreated;
@@ -15,10 +16,22 @@ class TokenableEventSubscriber
     public function __construct(
         protected Blacklist $blacklist,
         protected Whitelist $whitelist,
+        protected Repository $repository,
     ) {
         //
     }
 
+    /**
+     * Handles the creation of an access token by storing it in the whitelist.
+     *
+     * If whitelist functionality is disabled, the method returns early.
+     * Otherwise, both the access token and refresh token are added to the whitelist
+     * with their corresponding expiration timestamps.
+     *
+     * @param AccessTokenEvent $event The event containing token and authorization information
+     *
+     * @return void
+     */
     public function handleAccessTokenCreated(AccessTokenEvent $event): void
     {
         if ($this->whitelist->isWhitelistEnabled() === false) {
@@ -37,6 +50,16 @@ class TokenableEventSubscriber
         );
     }
 
+    /**
+     * Handles the revocation of an access token.
+     *
+     * If the whitelist is enabled, removes the access token and refresh token from it.
+     * If the blacklist is enabled, adds both tokens to the blacklist along with their expiration timestamps.
+     *
+     * @param AccessTokenRevoked $event The event containing token and authorization information
+     *
+     * @return void
+     */
     public function handleAccessTokenRevoked(AccessTokenRevoked $event): void
     {
         if ($this->whitelist->isWhitelistEnabled()) {
@@ -61,6 +84,52 @@ class TokenableEventSubscriber
     }
 
     /**
+     * Handles the creation of a suspend token.
+     *
+     * Generates a unique key based on the tokenable type, ID, and optionally the platform
+     * (if not a global token) and stores it in the repository indefinitely.
+     *
+     * @param SuspendTokenCreated $event The event containing tokenable and authorization information
+     *
+     * @return void
+     */
+    public function handleSuspendTokenCreated(SuspendTokenCreated $event): void
+    {
+        $keys = [$event->getAttribute('tokenable_type'), $event->getAttribute('tokenable_id')];
+
+        if (!$event->isGlobal()) {
+            $keys[] = $event->getAuthorization()->getAttribute('platform');
+        }
+
+        $key = implode('.', $keys);
+
+        $this->repository->forever($key, now()->toIso8601ZuluString());
+    }
+
+    /**
+     * Handles the revocation of a suspend token.
+     *
+     * Iterates over the hierarchical key structure derived from tokenable type, ID, and platform,
+     * removing each prefixed key from the repository.
+     *
+     * @param AccessTokenCreated $event The event containing tokenable and authorization information
+     *
+     * @return void
+     */
+    public function handleSuspendTokenRevoked(AccessTokenCreated $event): void
+    {
+        for ($i = 1; $i < count($keys = [
+            $event->getAuthorization()->getAttribute('tokenable_type'),
+            $event->getAuthorization()->getAttribute('tokenable_id'),
+            $event->getAuthorization()->getAttribute('platform'),
+        ]); $i++) {
+            $this->repository->forget(
+                implode('.', array_slice($keys, 0, $i + 1))
+            );
+        }
+    }
+
+    /**
      * Registers a listener for the subscriber.
      *
      * @param $events
@@ -73,10 +142,14 @@ class TokenableEventSubscriber
             AccessTokenCreated::class   => [
                 TokenManagementListener::class,
                 'handleAccessTokenCreated',
+                'handleSuspendTokenRevoked',
             ],
             AccessTokenRevoked::class   => 'handleAccessTokenRevoked',
             AccessTokenRefreshed::class => 'handleAccessTokenCreated',
-            SuspendTokenCreated::class  => SuspendTokenListener::class,
+            SuspendTokenCreated::class  => [
+                SuspendTokenListener::class,
+                'handleSuspendTokenCreated',
+            ],
         ];
     }
 }

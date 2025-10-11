@@ -5,18 +5,11 @@ namespace Jundayw\Tokenable\Listeners;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Jundayw\Tokenable\Contracts\Auth\Authenticable;
-use Jundayw\Tokenable\Contracts\Blacklist;
 use Jundayw\Tokenable\Events\AccessTokenRevoked;
 use Jundayw\Tokenable\Events\SuspendTokenCreated;
 
 class SuspendTokenListener extends ShouldQueueable
 {
-    public function __construct(
-        protected Blacklist $blacklist,
-    ) {
-        //
-    }
-
     /**
      * @inheritdoc
      *
@@ -44,25 +37,5 @@ class SuspendTokenListener extends ShouldQueueable
                     event(new AccessTokenRevoked($authorization->getAttributes()));
                 }
             }));
-
-        $keys = [$event->getAttribute('tokenable_type'), $event->getAttribute('tokenable_id')];
-
-        if (!$event->isGlobal()) {
-            $keys[] = $event->getAuthorization()->getAttribute('platform');
-        }
-
-        $this->blacklist->forever(implode(':', $keys), now()->toIso8601ZuluString());
-    }
-
-    /**
-     * Determine whether the listener should be queued.
-     *
-     * @param SuspendTokenCreated $event
-     *
-     * @return bool
-     */
-    public function shouldQueue($event): bool
-    {
-        return $this->blacklist->isBlacklistEnabled();
     }
 }

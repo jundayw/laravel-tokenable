@@ -17,6 +17,8 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
 {
     use AccessTokenHelper;
 
+    protected bool $suspended = false;
+
     /**
      * Attempt to resolve the authenticated tokenable model from the given request.
      *
@@ -86,7 +88,7 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
         }
 
         // Create a new authorization code token for the current tokenable entity.
-        if ($this->isSuspendToken($tokenable, $platform)) {
+        if ($this->isSuspended($tokenable, $platform)) {
             return $this->getGuard()
                 ->onceUsingId($this->getTokenable()->getKey())
                 ->setToken($this->getToken())
@@ -120,6 +122,19 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
     }
 
     /**
+     * Returns a cloned instance of the current object with a modified suspension state.
+     *
+     * This allows temporarily ignoring the suspended status for method chaining
+     * without affecting the original object.
+     *
+     * @return static A cloned instance with suspension state adjusted
+     */
+    public function withoutSuspension(): static
+    {
+        return tap(clone $this, fn(self $clone) => $clone->suspended = true);
+    }
+
+    /**
      * Determine if the given tokenable entity or its platform-specific token
      * is currently suspended.
      *
@@ -132,21 +147,28 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
      *
      * @return bool True if the token or tokenable is suspended, false otherwise.
      */
-    protected function isSuspendToken(Tokenable $tokenable, string $platform = 'default'): bool
+    protected function isSuspended(Tokenable $tokenable, string $platform = 'default'): bool
     {
-        if (!config('tokenable.suspend_enabled', true)) {
+        $disabled = config('tokenable.suspend_enabled', true) === false;
+
+        if ($disabled || $this->suspended) {
             return false;
         }
 
-        $target = [get_class($tokenable), $tokenable->getKey(), $platform];
+        $keys = [
+            get_class($tokenable),
+            $tokenable->getKey(),
+            $platform,
+        ];
 
-        for ($i = count($target); $i > 1; $i--) {
-            $key = implode(':', array_slice($target, 0, $i));
+        for ($i = 1; $i < count($keys); $i++) {
+            $key = implode('.', array_slice($keys, 0, $i + 1));
             try {
-                if ($this->blacklist->has($key)) {
+                if ($this->repository->has($key)) {
                     return true;
                 }
             } catch (\Throwable $e) {
+                //
             }
         }
 

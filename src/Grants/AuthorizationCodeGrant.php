@@ -24,17 +24,23 @@ class AuthorizationCodeGrant extends Grant implements AuthorizationCodeGrantCont
             return null;
         }
 
-        $authCode  = $this->getTokenManager()->driver(
-            $this->getTokenManager()->normalizeDriverName($request->getUser())
-        )->setAuthorizationCode($authCode);
-        $authCode  = $authCode->getAuthorizationCode();
-        $tokenable = $this->getRepository()->pull("auth_code_{$authCode}");
+        try {
+            $authCode  = $this->getTokenManager()->driver(
+                $this->getTokenManager()->normalizeDriverName($request->getUser())
+            )->setAuthorizationCode($authCode);
+            $authCode  = $authCode->getAuthorizationCode();
+            $tokenable = $this->repository->get("auth_code_{$authCode}");
 
-        if (is_null($tokenable)) {
-            return null;
+            if (is_null($tokenable)) {
+                return null;
+            }
+
+            return $this->setTokenable($tokenable);
+        } catch (\Throwable $e) {
+            //
         }
 
-        return $this->setTokenable($tokenable);
+        return null;
     }
 
     /**
@@ -48,37 +54,11 @@ class AuthorizationCodeGrant extends Grant implements AuthorizationCodeGrantCont
      */
     public function createToken(string $name, string $platform = 'default', array $scopes = []): ?Token
     {
-        return tap(
-            $this->getGuard()->login($this->getTokenable())->setToken($this->getToken()),
-            $this->forgetSuspendToken($platform)
-        )->createToken($name, $platform, $scopes);
-    }
-
-    /**
-     * Create a closure that removes suspension flags for the current tokenable entity.
-     *
-     * The returned closure will progressively remove suspension keys from the blacklist
-     * repository, starting from the most specific (e.g., `User:123:api`) down to the
-     * less specific levels (e.g., `User:123`).
-     *
-     * This is typically used to lift suspension restrictions applied to a tokenable
-     * or its platform-specific tokens.
-     *
-     * @param string $platform The platform or context to target (defaults to 'default').
-     *
-     * @return \Closure A closure that, when executed, forgets the suspension keys
-     *                  for the tokenable across the specified hierarchy.
-     */
-    protected function forgetSuspendToken(string $platform = 'default'): \Closure
-    {
-        return function () use ($platform) {
-            $target = [get_class($this->getTokenable()), $this->getTokenable()->getKey(), $platform];
-            for ($i = count($target); $i > 1; $i--) {
-                $this->blacklist->forget(
-                    implode(':', array_slice($target, 0, $i))
-                );
-            }
-        };
+        return $this->getGuard()
+            ->login($this->getTokenable())
+            ->setToken($this->getToken())
+            ->withoutSuspension()
+            ->createToken($name, $platform, $scopes);
     }
 
     /**
@@ -97,13 +77,14 @@ class AuthorizationCodeGrant extends Grant implements AuthorizationCodeGrantCont
             return null;
         }
 
-        return tap(
-            $this->getToken()->buildAuthCode($tokenable->tokens()->getModel(), $tokenable),
-            fn(Token $token) => $this->repository->put(
-                "auth_code_{$token->getAuthorizationCode()}",
-                $tokenable,
-                now()->addSeconds(config('tokenizer.auth_code_ttl', 60))
-            )
+        $token = $this->getToken()->buildAuthCode($tokenable->tokens()->getModel(), $tokenable);
+
+        $this->repository->put(
+            "auth_code_{$token->getAuthorizationCode()}",
+            $tokenable,
+            now()->addSeconds(config('tokenizer.auth_code_ttl', 60))
         );
+
+        return $token;
     }
 }

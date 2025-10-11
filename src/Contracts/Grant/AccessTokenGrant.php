@@ -52,4 +52,14 @@ interface AccessTokenGrant extends Grant
      * @return bool
      */
     public function revokeToken(Request $request): bool;
+
+    /**
+     * Returns a cloned instance of the current object with a modified suspension state.
+     *
+     * This allows temporarily ignoring the suspended status for method chaining
+     * without affecting the original object.
+     *
+     * @return static A cloned instance with suspension state adjusted
+     */
+    public function withoutSuspension(): static;
 }
