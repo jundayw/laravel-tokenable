@@ -37,4 +37,43 @@ class BlacklistRepository extends Repository implements Blacklist
 
         return $this;
     }
+
+    /**
+     * Fetches a value from the cache.
+     *
+     * @param string $key     The unique key of this item in the cache.
+     * @param mixed  $default Default value to return if the key does not exist.
+     *
+     * @return mixed The value of the item from the cache, or $default in case of cache miss.
+     */
+    #[\Override]
+    public function get($key, mixed $default = null): mixed
+    {
+        try {
+            return parent::get($key, $default);
+        } catch (\Throwable $e) {
+            //
+        }
+
+        return $default;
+    }
+
+    /**
+     * Determines whether an item is present in the cache.
+     *
+     * @param string $key The cache item key.
+     *
+     * @return bool
+     */
+    #[\Override]
+    public function has($key): bool
+    {
+        try {
+            return parent::has($key);
+        } catch (\Throwable $e) {
+            //
+        }
+
+        return false;
+    }
 }
