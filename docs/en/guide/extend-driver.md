@@ -144,3 +144,25 @@ return $this->guard('web')
     ->withToken('md5')
     ->createToken(name: 'PC Token', platform: 'pc');
 ```
+
+### Token Structure
+
+```json
+{
+    "access_token": "ffe4ce9253e47c9f195cf3b49517aea6",
+    "token_type": "md5",
+    "expires_in": "2025-10-11T12:41:05Z",
+    "refresh_token": "2356d366f039a7adfa7d52d1326a74f6",
+    "type": "token"
+}
+```
+
+### Authorization Code Structure
+
+```json
+{
+    "auth_code": "f9b6f018f03d15ead017bc7f8d101895",
+    "code_type": "md5",
+    "type": "code"
+}
+```
