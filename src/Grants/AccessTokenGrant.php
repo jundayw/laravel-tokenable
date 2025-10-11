@@ -7,11 +7,9 @@ use Jundayw\Tokenable\Concerns\Grant\AccessTokenHelper;
 use Jundayw\Tokenable\Contracts\Grant\AccessTokenGrant as AccessTokenGrantContract;
 use Jundayw\Tokenable\Contracts\Token\Token;
 use Jundayw\Tokenable\Contracts\Tokenable;
-use Jundayw\Tokenable\Contracts\Tokenable as TokenableContract;
 use Jundayw\Tokenable\Events\AccessTokenCreated;
 use Jundayw\Tokenable\Events\AccessTokenRefreshed;
 use Jundayw\Tokenable\Events\AccessTokenRevoked;
-use Psr\SimpleCache\InvalidArgumentException;
 
 class AccessTokenGrant extends Grant implements AccessTokenGrantContract
 {
@@ -30,10 +28,10 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
      * @param Request $request
      *     The incoming HTTP request that may contain an access token.
      *
-     * @return TokenableContract|null
+     * @return Tokenable|null
      *     The resolved tokenable model if authentication succeeds, or null on failure.
      */
-    public function findToken(Request $request): ?TokenableContract
+    public function findToken(Request $request): ?Tokenable
     {
         if (is_null($token = $this->getAccessTokenFromRequest($request))) {
             return null;
@@ -43,21 +41,13 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
             $this->getTokenManager()->normalizeDriverName($request->getUser())
         )->setAccessToken($token);
 
-        try {
-            if ($this->blacklist->isBlacklistEnabled() && $this->blacklist->has($token->getAccessToken())) {
-                return null;
-            }
-        } catch (InvalidArgumentException $e) {
+        if ($this->blacklist->isBlacklistEnabled() && $this->blacklist->has($token->getAccessToken())) {
             return null;
         }
 
-        try {
-            if ($this->whitelist->isWhitelistEnabled() && $authentication = $this->whitelist->get($token->getAccessToken())) {
-                $authentication->setRelation('tokenable', $authentication->getAttribute('tokenable'));
-            } else {
-                $authentication = $this->getAuthentication()->findAccessToken($token->getAccessToken());
-            }
-        } catch (InvalidArgumentException $e) {
+        if ($this->whitelist->isWhitelistEnabled() && $authentication = $this->whitelist->get($token->getAccessToken())) {
+            $authentication->loadMissing('tokenable');
+        } else {
             $authentication = $this->getAuthentication()->findAccessToken($token->getAccessToken());
         }
 
@@ -69,7 +59,7 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
 
         $this->setAuthentication($authentication)->setTokenable($tokenable)->setToken($token);
 
-        return tap($tokenable, static fn(TokenableContract $tokenable) => $tokenable->withAccessToken($authentication));
+        return tap($tokenable, static fn(Tokenable $tokenable) => $tokenable->withAccessToken($authentication));
     }
 
     /**
@@ -122,60 +112,6 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
     }
 
     /**
-     * Returns a cloned instance of the current object with a modified suspension state.
-     *
-     * This allows temporarily ignoring the suspended status for method chaining
-     * without affecting the original object.
-     *
-     * @return static A cloned instance with suspension state adjusted
-     */
-    public function withoutSuspension(): static
-    {
-        return tap(clone $this, fn(self $clone) => $clone->suspended = true);
-    }
-
-    /**
-     * Determine if the given tokenable entity or its platform-specific token
-     * is currently suspended.
-     *
-     * This method checks the blacklist repository using progressively less
-     * specific keys (e.g., `User:123:api`, `User:123`) to determine if a
-     * suspension flag exists for the tokenable or its platform.
-     *
-     * @param Tokenable $tokenable The tokenable model instance to check.
-     * @param string    $platform  The platform or context to check (defaults to 'default').
-     *
-     * @return bool True if the token or tokenable is suspended, false otherwise.
-     */
-    protected function isSuspended(Tokenable $tokenable, string $platform = 'default'): bool
-    {
-        $disabled = config('tokenable.suspend_enabled', true) === false;
-
-        if ($disabled || $this->suspended) {
-            return false;
-        }
-
-        $keys = [
-            get_class($tokenable),
-            $tokenable->getKey(),
-            $platform,
-        ];
-
-        for ($i = 1; $i < count($keys); $i++) {
-            $key = implode('.', array_slice($keys, 0, $i + 1));
-            try {
-                if ($this->repository->has($key)) {
-                    return true;
-                }
-            } catch (\Throwable $e) {
-                //
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Refresh the access and refresh tokens using the current refresh token.
      *
      * @param Request $request
@@ -184,9 +120,7 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
      */
     public function refreshToken(Request $request): ?Token
     {
-        $token = $this->getRefreshTokenFromRequest($request);
-
-        if (is_null($token)) {
+        if (is_null($token = $this->getRefreshTokenFromRequest($request))) {
             return null;
         }
 
@@ -194,15 +128,15 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
             $this->tokenManager->normalizeDriverName($request->getUser())
         )->setRefreshToken($token);
 
-        try {
-            if ($this->blacklist->isBlacklistEnabled() && $this->blacklist->has($token->getRefreshToken())) {
-                return null;
-            }
-        } catch (InvalidArgumentException $e) {
+        if ($this->blacklist->isBlacklistEnabled() && $this->blacklist->has($token->getRefreshToken())) {
             return null;
         }
 
-        $authentication = $this->authentication->findRefreshToken($token->getRefreshToken());
+        if ($this->whitelist->isWhitelistEnabled() && $authentication = $this->whitelist->get($token->getRefreshToken())) {
+            $authentication->loadMissing('tokenable');
+        } else {
+            $authentication = $this->getAuthentication()->findRefreshToken($token->getRefreshToken());
+        }
 
         if (is_null($authentication) ||
             !$this->isValidAuthenticationToken($authentication, $tokenable = $authentication->getRelation('tokenable')) ||
@@ -261,6 +195,56 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
         if ($this->getAuthentication()->delete()) {
             event(new AccessTokenRevoked($this->getAuthentication()->getAttributes()));
             return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns a cloned instance of the current object with a modified suspension state.
+     *
+     * This allows temporarily ignoring the suspended status for method chaining
+     * without affecting the original object.
+     *
+     * @return static A cloned instance with suspension state adjusted
+     */
+    public function withoutSuspension(): static
+    {
+        return tap(clone $this, fn(self $clone) => $clone->suspended = true);
+    }
+
+    /**
+     * Determine if the given tokenable entity or its platform-specific token
+     * is currently suspended.
+     *
+     * This method checks the blacklist repository using progressively less
+     * specific keys (e.g., `User:123:api`, `User:123`) to determine if a
+     * suspension flag exists for the tokenable or its platform.
+     *
+     * @param Tokenable $tokenable The tokenable model instance to check.
+     * @param string    $platform  The platform or context to check (defaults to 'default').
+     *
+     * @return bool True if the token or tokenable is suspended, false otherwise.
+     */
+    protected function isSuspended(Tokenable $tokenable, string $platform = 'default'): bool
+    {
+        $disabled = !config('tokenable.suspend_enabled', true);
+
+        if ($disabled || $this->suspended) {
+            return false;
+        }
+
+        $keys = [get_class($tokenable), $tokenable->getKey(), $platform];
+
+        for ($i = 1; $i < count($keys); $i++) {
+            $key = implode('.', array_slice($keys, 0, $i + 1));
+            try {
+                if ($this->repository->has($key)) {
+                    return true;
+                }
+            } catch (\Throwable $e) {
+                //
+            }
         }
 
         return false;

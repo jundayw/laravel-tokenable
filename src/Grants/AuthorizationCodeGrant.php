@@ -31,11 +31,9 @@ class AuthorizationCodeGrant extends Grant implements AuthorizationCodeGrantCont
             $authCode  = $authCode->getAuthorizationCode();
             $tokenable = $this->repository->get("auth_code_{$authCode}");
 
-            if (is_null($tokenable)) {
-                return null;
+            if (!is_null($tokenable)) {
+                return $this->setTokenable($tokenable);
             }
-
-            return $this->setTokenable($tokenable);
         } catch (\Throwable $e) {
             //
         }
