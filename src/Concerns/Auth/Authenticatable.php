@@ -3,6 +3,7 @@
 namespace Jundayw\Tokenable\Concerns\Auth;
 
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Jundayw\Tokenable\Exceptions\InvalidAuthTokenException;
 
 trait Authenticatable
 {
@@ -44,15 +45,25 @@ trait Authenticatable
      * @param string $token
      *
      * @return static|null
+     * @throws InvalidAuthTokenException
      */
     public function findRefreshToken(string $token): ?static
     {
-        return $this->newQuery()
+        $token = $this->newQuery()
             ->with('tokenable')
             ->where('refresh_token', $token)
-            ->where('refresh_token_available_at', '<=', now())
             ->where('refresh_token_expire_at', '>=', now())
             ->first();
+
+        if (is_null($token)) {
+            return null;
+        }
+
+        if (now()->lt($token->getAttribute('refresh_token_available_at'))) {
+            throw new InvalidAuthTokenException('The token is not yet available.');
+        }
+
+        return $token;
     }
 
     /**
