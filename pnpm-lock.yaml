@@ -8,19 +8,19 @@ importers:
 
   .:
     dependencies:
-      vuepress:
-        specifier: ^1.9.10
-        version: 1.9.10(@vue/compiler-sfc@3.5.21)(hogan.js@3.0.2)(lodash@4.17.21)
-    devDependencies:
       '@vuepress/plugin-back-to-top':
         specifier: ^1.9.10
         version: 1.9.10
-      gh-pages:
-        specifier: ^6.3.0
-        version: 6.3.0
+      vuepress:
+        specifier: ^1.9.10
+        version: 1.9.10(@vue/compiler-sfc@3.5.21)(hogan.js@3.0.2)(lodash@4.17.21)
       vuepress-plugin-code-copy:
         specifier: ^1.0.6
         version: 1.0.6
+    devDependencies:
+      gh-pages:
+        specifier: ^6.3.0
+        version: 6.3.0
 
 packages:
 
