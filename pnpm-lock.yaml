@@ -18,6 +18,9 @@ importers:
       gh-pages:
         specifier: ^6.3.0
         version: 6.3.0
+      vuepress-plugin-code-copy:
+        specifier: ^1.0.6
+        version: 1.0.6
 
 packages:
 
@@ -4796,6 +4799,9 @@ packages:
     engines: {node: '>=6.9'}
     peerDependencies:
       webpack: ^1.0.0 || ^2.0.0 || ^3.0.0 || ^4.0.0
+
+  vuepress-plugin-code-copy@1.0.6:
+    resolution: {integrity: sha512-FiqwMtlb4rEsOI56O6sSkekcd3SlESxbkR2IaTIQxsMOMoalKfW5R9WlR1Pjm10v6jmU661Ex8MR11k9IzrNUg==}
 
   vuepress-plugin-container@2.1.5:
     resolution: {integrity: sha512-TQrDX/v+WHOihj3jpilVnjXu9RcTm6m8tzljNJwYhxnJUW0WWQ0hFLcDTqTBwgKIFdEiSxVOmYE+bJX/sq46MA==}
@@ -10752,6 +10758,8 @@ snapshots:
       toposort: 1.0.7
       util.promisify: 1.0.0
       webpack: 4.47.0
+
+  vuepress-plugin-code-copy@1.0.6: {}
 
   vuepress-plugin-container@2.1.5:
     dependencies:
