@@ -1,0 +1,37 @@
+.code-copy {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+pre {
+    overflow: auto; /* 启用滚动条 */
+    padding: 16px;
+    border-radius: 6px;
+    background-color: #1e1e1e;
+    color: #fff;
+}
+
+/* 滚动条整体 */
+pre::-webkit-scrollbar {
+    width: 8px; /* 垂直滚动条宽度 */
+    height: 8px; /* 水平滚动条高度 */
+}
+
+/* 滑块轨道 */
+pre::-webkit-scrollbar-track {
+    background: #2e2e2e;
+    border-radius: 6px;
+}
+
+/* 滑块本体 */
+pre::-webkit-scrollbar-thumb {
+    background-color: #ff6600;
+    border-radius: 6px;
+    border: 2px solid #2e2e2e; /* 给滑块留点间距 */
+}
+
+/* 鼠标悬停滑块 */
+pre::-webkit-scrollbar-thumb:hover {
+    background-color: #ffa500;
+}
