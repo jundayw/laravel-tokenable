@@ -26,9 +26,8 @@
     ],
     "require": {
         "php": "^8.0",
-        "firebase/php-jwt": "^6.11"
+        "firebase/php-jwt": "^7.0"
     },
-    "require-dev": {},
     "autoload": {
         "psr-4": {
             "Jundayw\\Tokenable\\": "src/"
