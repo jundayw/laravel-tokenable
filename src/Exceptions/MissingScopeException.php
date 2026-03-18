@@ -2,7 +2,7 @@
 
 namespace Jundayw\Tokenable\Exceptions;
 
-class MissingScopeException extends InvalidAuthTokenException
+class MissingScopeException extends AuthorizationException
 {
     /**
      * The scopes that the user did not have.
@@ -19,7 +19,7 @@ class MissingScopeException extends InvalidAuthTokenException
      *
      * @return void
      */
-    public function __construct(array|string $scopes = [], string $message = 'Invalid scope(s) provided.')
+    public function __construct(array|string $scopes = [], string $message = 'MissingScope')
     {
         parent::__construct($message);
 

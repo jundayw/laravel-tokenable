@@ -156,6 +156,21 @@ return $this->guard('web')->refreshToken();
 return $this->guard()->revokeToken();
 ```
 
+## Exception
+
+```plaintext
+TokenableException
+├── AuthenticationException (HTTP 401)                // 所有认证失败的基类
+│   └── TokenInvalidException                         // 令牌相关的认证异常基类
+│       ├── TokenNotFoundException                    // 令牌不存在
+│       ├── TokenExpiredException                     // 令牌过期基类
+│       │   ├── AccessTokenExpiredException           // 访问令牌过期
+│       │   └── RefreshTokenExpiredException          // 刷新令牌过期
+│       └── RefreshTokenNotAvailableException         // 刷新令牌尚未生效
+└── AuthorizationException (HTTP 403)                 // 所有授权失败的基类
+    └── MissingScopeException                         // 缺少必要权限范围
+```
+
 <!-- CONTRIBUTING -->
 
 ## Contributing

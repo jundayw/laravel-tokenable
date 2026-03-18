@@ -51,8 +51,7 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
             $authentication = $this->getAuthentication()->findAccessToken($token->getAccessToken());
         }
 
-        if (is_null($authentication) ||
-            !$this->isValidAuthenticationToken($authentication, $tokenable = $authentication->getRelation('tokenable')) ||
+        if (!$this->isValidAuthenticationToken($authentication, $tokenable = $authentication->getRelation('tokenable')) ||
             !$this->supportsTokens($tokenable)) {
             return null;
         }
@@ -186,11 +185,7 @@ class AccessTokenGrant extends Grant implements AccessTokenGrantContract
             $this->getTokenManager()->normalizeDriverName($request->getUser())
         )->setAccessToken($token);
 
-        $authentication = $this->getAuthentication()->findAccessToken($token->getAccessToken());
-
-        if (is_null($authentication)) {
-            return false;
-        }
+        $this->setAuthentication($this->getAuthentication()->findAccessToken($token->getAccessToken()));
 
         if ($this->getAuthentication()->delete()) {
             event(new AccessTokenRevoked($this->getAuthentication()->getAttributes()));

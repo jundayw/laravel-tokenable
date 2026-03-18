@@ -21,9 +21,9 @@ interface Authenticable
      *
      * @param string $token
      *
-     * @return static|null
+     * @return static
      */
-    public function findAccessToken(string $token): ?static;
+    public function findAccessToken(string $token): static;
 
     /**
      * Find a refresh token by its plain-text value.
@@ -33,9 +33,9 @@ interface Authenticable
      *
      * @param string $token
      *
-     * @return static|null
+     * @return static
      */
-    public function findRefreshToken(string $token): ?static;
+    public function findRefreshToken(string $token): static;
 
     /**
      *  Update the token with the given attributes and return the fresh model.

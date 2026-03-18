@@ -3,7 +3,10 @@
 namespace Jundayw\Tokenable\Concerns\Auth;
 
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Jundayw\Tokenable\Exceptions\InvalidAuthTokenException;
+use Jundayw\Tokenable\Exceptions\AccessTokenExpiredException;
+use Jundayw\Tokenable\Exceptions\RefreshTokenExpiredException;
+use Jundayw\Tokenable\Exceptions\RefreshTokenNotAvailableException;
+use Jundayw\Tokenable\Exceptions\TokenNotFoundException;
 
 trait Authenticatable
 {
@@ -25,15 +28,24 @@ trait Authenticatable
      *
      * @param string $token
      *
-     * @return static|null
+     * @return static
      */
-    public function findAccessToken(string $token): ?static
+    public function findAccessToken(string $token): static
     {
-        return $this->newQuery()
+        $token = $this->newQuery()
             ->with('tokenable')
             ->where('access_token', $token)
-            ->where('access_token_expire_at', '>=', now())
             ->first();
+
+        if (is_null($token)) {
+            throw new TokenNotFoundException;
+        }
+
+        if (now()->gt($token->getAttribute('access_token_expire_at'))) {
+            throw new AccessTokenExpiredException;
+        }
+
+        return $token;
     }
 
     /**
@@ -44,23 +56,25 @@ trait Authenticatable
      *
      * @param string $token
      *
-     * @return static|null
-     * @throws InvalidAuthTokenException
+     * @return static
      */
-    public function findRefreshToken(string $token): ?static
+    public function findRefreshToken(string $token): static
     {
         $token = $this->newQuery()
             ->with('tokenable')
             ->where('refresh_token', $token)
-            ->where('refresh_token_expire_at', '>=', now())
             ->first();
 
         if (is_null($token)) {
-            return null;
+            throw new TokenNotFoundException;
+        }
+
+        if (now()->gt($token->getAttribute('refresh_token_expire_at'))) {
+            throw new RefreshTokenExpiredException;
         }
 
         if (now()->lt($token->getAttribute('refresh_token_available_at'))) {
-            throw new InvalidAuthTokenException('The token is not yet available.');
+            throw new RefreshTokenNotAvailableException;
         }
 
         return $token;

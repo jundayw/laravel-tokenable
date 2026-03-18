@@ -2,12 +2,12 @@
 
 namespace Jundayw\Tokenable\Exceptions;
 
-class AuthenticationException extends \Illuminate\Auth\AuthenticationException
-{
-    public function __construct($message = 'Unauthenticated.', array|string $guards = [], string $redirectTo = null)
-    {
-        parent::__construct($message, is_array($guards) ? $guards : [$guards], $redirectTo);
+use Throwable;
 
-        $this->code = 401;
+class AuthenticationException extends TokenableException
+{
+    public function __construct(string $message = 'Unauthenticated', int $code = 401, ?Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
     }
 }
