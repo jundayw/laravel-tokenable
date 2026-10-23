@@ -42,7 +42,7 @@ class TokenableServiceProvider extends ServiceProvider
             ], config('auth.guards.tokenable', [])),
         ]);
         if (!app()->configurationIsCached()) {
-            $this->mergeConfigFrom(__DIR__ . '/../config/tokenable.php', 'tokenable');
+            $this->mergeConfigFrom(__DIR__.'/../config/tokenable.php', 'tokenable');
         }
 
         Tokenable::loadKeysFrom(config('tokenable.key_path'));
@@ -96,8 +96,8 @@ class TokenableServiceProvider extends ServiceProvider
         $prefix    = trim(config('tokenable.cache.prefix'), ':');
 
         config([
-            'cache.stores.blacklist' => $blacklist ?: $default + ['prefix' => $prefix . ':blacklist'],
-            'cache.stores.whitelist' => $whitelist ?: $default + ['prefix' => $prefix . ':whitelist'],
+            'cache.stores.blacklist' => $blacklist ?: $default + ['prefix' => $prefix.':blacklist'],
+            'cache.stores.whitelist' => $whitelist ?: $default + ['prefix' => $prefix.':whitelist'],
         ]);
 
         $this->app->bind(Blacklist::class, static function ($app) {
@@ -173,7 +173,7 @@ class TokenableServiceProvider extends ServiceProvider
     protected function registerMigrations(): void
     {
         if (Tokenable::shouldRunMigrations()) {
-            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         }
     }
 
@@ -185,11 +185,11 @@ class TokenableServiceProvider extends ServiceProvider
     protected function registerPublishing(): void
     {
         $this->publishes([
-            __DIR__ . '/../database/migrations' => database_path('migrations'),
+            __DIR__.'/../database/migrations' => database_path('migrations'),
         ], 'tokenable-migrations');
 
         $this->publishes([
-            __DIR__ . '/../config/tokenable.php' => config_path('tokenable.php'),
+            __DIR__.'/../config/tokenable.php' => config_path('tokenable.php'),
         ], 'tokenable-config');
     }
 
@@ -215,11 +215,14 @@ class TokenableServiceProvider extends ServiceProvider
     protected function registerGuard(): void
     {
         Auth::resolved(function (AuthFactoryContract $auth) {
-            $auth->extend('tokenable', function ($app, string $name, array $config) use ($auth) {
-                return tap($this->makeGuard($auth, $name, $config), function (Guard $guard) {
-                    app()->refresh('request', $guard, 'setRequest');
-                });
-            });
+            $guard = $this->makeGuard(...);
+            $auth->extend(
+                'tokenable',
+                static fn($app, string $name, array $config) => tap(
+                    $guard($auth, $name, $config),
+                    static fn(Guard $guard) => app()->refresh('request', $guard, 'setRequest')
+                )
+            );
         });
     }
 
